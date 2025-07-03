@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete JavaScript Guide</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Complete JavaScript Guide</h1>
+            <p>A comprehensive collection of JavaScript concepts, patterns, and best practices</p>
+        </header>
+
+        <nav class="navigation">
+            <ul>
+                <li><a href="#basics" data-section="basics">Fundamentals</a></li>
+                <li><a href="#advanced" data-section="advanced">Advanced Concepts</a></li>
+                <li><a href="#patterns" data-section="patterns">Best Practices</a></li>
+                <li><a href="#dom" data-section="dom">DOM & Web APIs</a></li>
+                <li><a href="#examples" data-section="examples">Live Examples</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <!-- Fundamentals Section -->
+            <section id="basics" class="section active">
+                <h2>📚 JavaScript Fundamentals</h2>
+                <div class="card">
+                    <h3>Variables and Data Types</h3>
+                    <p>Learn about let, const, var and JavaScript's dynamic typing system.</p>
+                    <button onclick="runBasicExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Functions</h3>
+                    <p>Explore function declarations, expressions, arrow functions, and more.</p>
+                    <button onclick="runFunctionExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Objects and Arrays</h3>
+                    <p>Work with JavaScript objects, arrays, and their powerful methods.</p>
+                    <button onclick="runObjectArrayExamples()">Run Examples</button>
+                </div>
+            </section>
+
+            <!-- Advanced Concepts Section -->
+            <section id="advanced" class="section">
+                <h2>🔧 Advanced Concepts</h2>
+                <div class="card">
+                    <h3>Classes and Inheritance</h3>
+                    <p>ES6 classes, inheritance, static methods, and prototypes.</p>
+                    <button onclick="runClassExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Async Programming</h3>
+                    <p>Promises, async/await, and handling asynchronous operations.</p>
+                    <button onclick="runAsyncExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Closures and Scope</h3>
+                    <p>Understanding closures, lexical scope, and module patterns.</p>
+                    <button onclick="runClosureExamples()">Run Examples</button>
+                </div>
+            </section>
+
+            <!-- Best Practices Section -->
+            <section id="patterns" class="section">
+                <h2>✨ Best Practices & Patterns</h2>
+                <div class="card">
+                    <h3>Design Patterns</h3>
+                    <p>Singleton, Observer, Factory patterns and their implementations.</p>
+                    <button onclick="runPatternExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Functional Programming</h3>
+                    <p>Higher-order functions, composition, currying, and pure functions.</p>
+                    <button onclick="runFunctionalExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Performance Optimization</h3>
+                    <p>Debouncing, throttling, memoization, and memory management.</p>
+                    <button onclick="runPerformanceExamples()">Run Examples</button>
+                </div>
+            </section>
+
+            <!-- DOM & Web APIs Section -->
+            <section id="dom" class="section">
+                <h2>🌐 DOM & Web APIs</h2>
+                <div class="card">
+                    <h3>DOM Manipulation</h3>
+                    <p>Selecting, creating, and modifying HTML elements dynamically.</p>
+                    <button onclick="runDOMExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Event Handling</h3>
+                    <p>Event listeners, delegation, and custom events.</p>
+                    <button onclick="runEventExamples()">Run Examples</button>
+                </div>
+                
+                <div class="card">
+                    <h3>Form Validation</h3>
+                    <p>Client-side form validation with custom validators.</p>
+                    <button onclick="runFormExamples()">Run Examples</button>
+                </div>
+            </section>
+
+            <!-- Live Examples Section -->
+            <section id="examples" class="section">
+                <h2>🎯 Interactive Examples</h2>
+                
+                <div class="example-container">
+                    <h3>To-Do List Application</h3>
+                    <div class="todo-app">
+                        <input type="text" id="todoInput" placeholder="Add a new task...">
+                        <button onclick="addTodo()">Add</button>
+                        <ul id="todoList"></ul>
+                    </div>
+                </div>
+
+                <div class="example-container">
+                    <h3>API Data Fetcher</h3>
+                    <div class="api-demo">
+                        <button onclick="fetchUserData()">Fetch User Data</button>
+                        <div id="userData"></div>
+                    </div>
+                </div>
+
+                <div class="example-container">
+                    <h3>Form Validation Demo</h3>
+                    <form id="demoForm" class="demo-form">
+                        <input type="text" name="username" placeholder="Username" required>
+                        <input type="email" name="email" placeholder="Email" required>
+                        <input type="password" name="password" placeholder="Password" required>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+
+                <div class="example-container">
+                    <h3>Local Storage Demo</h3>
+                    <div class="storage-demo">
+                        <input type="text" id="storageKey" placeholder="Key">
+                        <input type="text" id="storageValue" placeholder="Value">
+                        <button onclick="saveToStorage()">Save</button>
+                        <button onclick="loadFromStorage()">Load</button>
+                        <button onclick="clearStorage()">Clear</button>
+                        <div id="storageResult"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Output Console -->
+        <div class="console-container">
+            <h3>📝 Console Output</h3>
+            <div id="console" class="console"></div>
+            <button onclick="clearConsole()" class="clear-btn">Clear</button>
+        </div>
+    </div>
+
+    <!-- Modal for displaying results -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Result</h2>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Load JavaScript files -->
+    <script src="main.js"></script>
+    <script src="advanced-concepts.js"></script>
+    <script src="best-practices.js"></script>
+    <script src="dom-web-apis.js"></script>
+    
+    <!-- Interactive Examples Script -->
+    <script>
+        // Console output functionality
+        function logToConsole(message, type = 'info') {
+            const console = document.getElementById('console');
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `<span class="timestamp">${new Date().toLocaleTimeString()}</span> ${message}`;
+            console.appendChild(logEntry);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '';
+        }
+
+        // Navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('.navigation a');
+            const sections = document.querySelectorAll('.section');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetSection = this.getAttribute('data-section');
+                    
+                    // Update active states
+                    sections.forEach(section => section.classList.remove('active'));
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                    
+                    document.getElementById(targetSection).classList.add('active');
+                    this.classList.add('active');
+                });
+            });
+        });
+
+        // Example functions for each section
+        function runBasicExamples() {
+            logToConsole('Running JavaScript Fundamentals examples...', 'info');
+            logToConsole('Check main.js for detailed examples of variables, functions, objects, and arrays.', 'success');
+        }
+
+        function runFunctionExamples() {
+            const greet = name => `Hello, ${name}!`;
+            const result = greet('JavaScript Developer');
+            logToConsole(`Function example: ${result}`, 'success');
+        }
+
+        function runObjectArrayExamples() {
+            const person = { name: 'John', age: 30 };
+            const numbers = [1, 2, 3, 4, 5];
+            const doubled = numbers.map(n => n * 2);
+            logToConsole(`Object: ${JSON.stringify(person)}`, 'success');
+            logToConsole(`Array doubled: ${JSON.stringify(doubled)}`, 'success');
+        }
+
+        function runClassExamples() {
+            logToConsole('Running Advanced Concepts examples...', 'info');
+            logToConsole('Check advanced-concepts.js for classes, async/await, and more.', 'success');
+        }
+
+        function runAsyncExamples() {
+            logToConsole('Simulating async operation...', 'info');
+            setTimeout(() => {
+                logToConsole('Async operation completed!', 'success');
+            }, 1000);
+        }
+
+        function runClosureExamples() {
+            function createCounter() {
+                let count = 0;
+                return () => ++count;
+            }
+            const counter = createCounter();
+            logToConsole(`Closure example - Counter: ${counter()}, ${counter()}, ${counter()}`, 'success');
+        }
+
+        function runPatternExamples() {
+            logToConsole('Running Design Patterns examples...', 'info');
+            logToConsole('Check best-practices.js for Singleton, Observer, and Factory patterns.', 'success');
+        }
+
+        function runFunctionalExamples() {
+            const add = (a, b) => a + b;
+            const multiply = (a, b) => a * b;
+            const compose = (f, g) => (x) => f(g(x));
+            const addOneAndDouble = compose(x => x * 2, x => x + 1);
+            logToConsole(`Functional composition: ${addOneAndDouble(5)}`, 'success');
+        }
+
+        function runPerformanceExamples() {
+            function debounce(func, delay) {
+                let timeoutId;
+                return function(...args) {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => func.apply(this, args), delay);
+                };
+            }
+            logToConsole('Performance utilities like debounce, throttle created!', 'success');
+        }
+
+        function runDOMExamples() {
+            const newElement = document.createElement('div');
+            newElement.textContent = 'Dynamically created element!';
+            newElement.style.color = 'green';
+            logToConsole('DOM element created and styled!', 'success');
+        }
+
+        function runEventExamples() {
+            logToConsole('Event handling examples running...', 'info');
+            logToConsole('Check dom-web-apis.js for event delegation and custom events.', 'success');
+        }
+
+        function runFormExamples() {
+            logToConsole('Form validation examples available in the Interactive Examples section.', 'info');
+        }
+
+        // Interactive Examples
+        let todos = [];
+
+        function addTodo() {
+            const input = document.getElementById('todoInput');
+            const value = input.value.trim();
+            
+            if (value) {
+                todos.push({ id: Date.now(), text: value, completed: false });
+                input.value = '';
+                renderTodos();
+                logToConsole(`Added todo: "${value}"`, 'success');
+            }
+        }
+
+        function renderTodos() {
+            const list = document.getElementById('todoList');
+            list.innerHTML = todos.map(todo => `
+                <li class="${todo.completed ? 'completed' : ''}">
+                    <span onclick="toggleTodo(${todo.id})">${todo.text}</span>
+                    <button onclick="deleteTodo(${todo.id})">Delete</button>
+                </li>
+            `).join('');
+        }
+
+        function toggleTodo(id) {
+            todos = todos.map(todo => 
+                todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            );
+            renderTodos();
+        }
+
+        function deleteTodo(id) {
+            todos = todos.filter(todo => todo.id !== id);
+            renderTodos();
+        }
+
+        // API Data Fetcher
+        async function fetchUserData() {
+            const userDataDiv = document.getElementById('userData');
+            userDataDiv.innerHTML = 'Loading...';
+            
+            try {
+                // Simulate API call
+                const mockUserData = {
+                    id: 1,
+                    name: 'John Doe',
+                    email: 'john@example.com',
+                    username: 'johndoe'
+                };
+                
+                // Simulate network delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                userDataDiv.innerHTML = `
+                    <h4>User Data:</h4>
+                    <p><strong>Name:</strong> ${mockUserData.name}</p>
+                    <p><strong>Email:</strong> ${mockUserData.email}</p>
+                    <p><strong>Username:</strong> ${mockUserData.username}</p>
+                `;
+                
+                logToConsole('User data fetched successfully!', 'success');
+            } catch (error) {
+                userDataDiv.innerHTML = 'Error loading user data';
+                logToConsole(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Form Validation
+        document.getElementById('demoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);
+            
+            // Simple validation
+            const errors = [];
+            if (data.username.length < 3) {
+                errors.push('Username must be at least 3 characters');
+            }
+            if (!data.email.includes('@')) {
+                errors.push('Email must be valid');
+            }
+            if (data.password.length < 6) {
+                errors.push('Password must be at least 6 characters');
+            }
+            
+            if (errors.length > 0) {
+                logToConsole(`Validation errors: ${errors.join(', ')}`, 'error');
+            } else {
+                logToConsole('Form submitted successfully!', 'success');
+                this.reset();
+            }
+        });
+
+        // Storage Demo
+        function saveToStorage() {
+            const key = document.getElementById('storageKey').value;
+            const value = document.getElementById('storageValue').value;
+            
+            if (key && value) {
+                localStorage.setItem(key, value);
+                logToConsole(`Saved "${key}: ${value}" to localStorage`, 'success');
+            }
+        }
+
+        function loadFromStorage() {
+            const key = document.getElementById('storageKey').value;
+            if (key) {
+                const value = localStorage.getItem(key);
+                document.getElementById('storageResult').textContent = 
+                    value ? `${key}: ${value}` : 'Key not found';
+                logToConsole(value ? 'Data loaded from localStorage' : 'Key not found', 
+                           value ? 'success' : 'warning');
+            }
+        }
+
+        function clearStorage() {
+            localStorage.clear();
+            document.getElementById('storageResult').textContent = '';
+            logToConsole('localStorage cleared', 'info');
+        }
+
+        // Modal functionality
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Override console.log to also log to our custom console
+        const originalConsoleLog = console.log;
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            logToConsole(args.join(' '), 'info');
+        };
+
+        // Welcome message
+        document.addEventListener('DOMContentLoaded', function() {
+            logToConsole('🚀 Welcome to the Complete JavaScript Guide!', 'success');
+            logToConsole('Navigate through sections to explore different concepts.', 'info');
+        });
+    </script>
+</body>
+</html>
