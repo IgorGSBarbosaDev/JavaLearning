@@ -173,104 +173,6 @@ src/
 4. Add integration tests
 5. Document API with OpenAPI
 
-**Key Code Examples:**
-
-```java
-// Task Entity
-@Entity
-@Table(name = "tasks")
-public class Task {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @NotBlank
-    @Size(max = 100)
-    private String title;
-    
-    @Size(max = 500)
-    private String description;
-    
-    @Enumerated(EnumType.STRING)
-    private TaskStatus status = TaskStatus.PENDING;
-    
-    @NotNull
-    private LocalDateTime createdAt = LocalDateTime.now();
-    
-    private LocalDateTime dueDate;
-    
-    // Constructors, getters, setters
-}
-
-// Repository
-@Repository
-public interface TaskRepository extends JpaRepository<Task, Long> {
-    List<Task> findByStatus(TaskStatus status);
-    List<Task> findByDueDateBefore(LocalDateTime date);
-    
-    @Query("SELECT t FROM Task t WHERE t.title LIKE %:keyword% OR t.description LIKE %:keyword%")
-    List<Task> findByKeyword(@Param("keyword") String keyword);
-}
-
-// Service
-@Service
-@Transactional
-public class TaskServiceImpl implements TaskService {
-    
-    private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
-    
-    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper) {
-        this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
-    }
-    
-    @Override
-    public TaskResponseDto createTask(TaskRequestDto request) {
-        Task task = taskMapper.toEntity(request);
-        Task savedTask = taskRepository.save(task);
-        return taskMapper.toDto(savedTask);
-    }
-    
-    @Override
-    @Transactional(readOnly = true)
-    public List<TaskResponseDto> getAllTasks() {
-        return taskRepository.findAll()
-                .stream()
-                .map(taskMapper::toDto)
-                .collect(Collectors.toList());
-    }
-    
-    // Other CRUD methods...
-}
-
-// Controller
-@RestController
-@RequestMapping("/api/v1/tasks")
-@Validated
-public class TaskController {
-    
-    private final TaskService taskService;
-    
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
-    
-    @PostMapping
-    public ResponseEntity<TaskResponseDto> createTask(@Valid @RequestBody TaskRequestDto request) {
-        TaskResponseDto response = taskService.createTask(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-    
-    @GetMapping
-    public ResponseEntity<List<TaskResponseDto>> getAllTasks() {
-        List<TaskResponseDto> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(tasks);
-    }
-    
-    // Other endpoints...
-}
-```
 
 ---
 
@@ -408,131 +310,6 @@ src/
 │       └── data.sql
 ```
 
-#### ⚙️ Implementation Steps
-
-**Phase 1: Entity Design (Week 1)**
-```java
-// Book Entity with relationships
-@Entity
-@Table(name = "books")
-public class Book {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @NotBlank
-    @Size(max = 200)
-    private String title;
-    
-    @NotBlank
-    @Size(max = 100)
-    private String author;
-    
-    @NotBlank
-    @Size(max = 20)
-    @Column(unique = true)
-    private String isbn;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-    
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
-    private List<Borrowing> borrowings = new ArrayList<>();
-    
-    private boolean available = true;
-    
-    // Constructors, getters, setters
-}
-
-// Member Entity
-@Entity
-@Table(name = "members")
-public class Member {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @NotBlank
-    @Size(max = 100)
-    private String name;
-    
-    @Email
-    @NotBlank
-    @Column(unique = true)
-    private String email;
-    
-    @NotBlank
-    @Size(max = 15)
-    private String phone;
-    
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Borrowing> borrowings = new ArrayList<>();
-    
-    private LocalDate membershipDate = LocalDate.now();
-    
-    // Constructors, getters, setters
-}
-```
-
-**Phase 2: Web Interface (Week 2-3)**
-```html
-<!-- Thymeleaf template example: book list -->
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Library Management - Books</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <nav th:replace="~{layout/navbar :: navbar}"></nav>
-    
-    <div class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Books</h2>
-            <a th:href="@{/books/new}" class="btn btn-primary">Add New Book</a>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>ISBN</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="book : ${books}">
-                            <td th:text="${book.title}"></td>
-                            <td th:text="${book.author}"></td>
-                            <td th:text="${book.isbn}"></td>
-                            <td th:text="${book.category.name}"></td>
-                            <td>
-                                <span th:class="${book.available} ? 'badge bg-success' : 'badge bg-danger'"
-                                      th:text="${book.available} ? 'Available' : 'Borrowed'"></span>
-                            </td>
-                            <td>
-                                <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-sm btn-info">View</a>
-                                <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-sm btn-warning">Edit</a>
-                                <a th:href="@{/books/{id}/delete(id=${book.id})}" class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Are you sure?')">Delete</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</body>
-</html>
-```
-
 ---
 
 ### 🟢 Project 3: Weather Dashboard API
@@ -630,83 +407,6 @@ public class Member {
 - Event-driven architecture
 - Configuration management
 
-#### 🚀 Getting Started Guide
-
-**Step 1: Multi-Module Maven Setup**
-```xml
-<!-- Parent pom.xml -->
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-    <modelVersion>4.0.0</modelVersion>
-    
-    <groupId>com.yourname.ecommerce</groupId>
-    <artifactId>ecommerce-platform</artifactId>
-    <version>1.0.0</version>
-    <packaging>pom</packaging>
-    
-    <modules>
-        <module>eureka-server</module>
-        <module>api-gateway</module>
-        <module>product-service</module>
-        <module>order-service</module>
-        <module>payment-service</module>
-        <module>common</module>
-    </modules>
-    
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <spring-boot.version>3.1.0</spring-boot.version>
-        <spring-cloud.version>2022.0.3</spring-cloud.version>
-    </properties>
-    
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-</project>
-```
-
-**Step 2: Service Discovery Setup**
-```java
-// Eureka Server
-@SpringBootApplication
-@EnableEurekaServer
-public class EurekaServerApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(EurekaServerApplication.class, args);
-    }
-}
-```
-
-```yaml
-# eureka-server/application.yml
-server:
-  port: 8761
-
-spring:
-  application:
-    name: eureka-server
-
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-```
 
 #### 📁 Project Structure
 ```
@@ -870,13 +570,411 @@ public class GatewayConfig {
 **Description:** A real-time chat application with WebSocket support, user presence, file sharing, and message history.  
 **Business Value:** Learn WebSocket communication, real-time features, and scalable chat architecture.
 
+#### 🏗️ Architecture Design
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Web Client    │    │   Mobile App    │    │   Admin Panel   │
+│   (React/JS)    │    │   (React Native)│    │   (Angular)     │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 │
+                       ┌─────────▼────────┐
+                       │   Load Balancer  │
+                       │   (Nginx/HAProxy)│
+                       └─────────┬────────┘
+                                 │
+                       ┌─────────▼────────┐
+                       │  Spring Boot     │
+                       │  WebSocket API   │
+                       │  (STOMP/SockJS)  │
+                       └─────────┬────────┘
+                                 │
+        ┌────────────────────────┼────────────────────────┐
+        │                        │                        │
+┌───────▼───────┐     ┌─────────▼────────┐     ┌─────────▼────────┐
+│   MongoDB     │     │     Redis        │     │   File Storage   │
+│  (Messages,   │     │  (Sessions,      │     │   (AWS S3 /      │
+│   Rooms,      │     │   Presence,      │     │   Local FS)      │
+│   Users)      │     │   Cache)         │     │                  │
+└───────────────┘     └──────────────────┘     └──────────────────┘
+```
+
 #### 🛠️ Technology Stack
-- **Core**: Spring Boot, Spring WebSocket, Spring Security
+- **Core**: Spring Boot 3.x, Spring WebSocket, Spring Security
 - **Real-time**: WebSocket, STOMP, SockJS
-- **Database**: MongoDB (messages), Redis (sessions, presence)
-- **File Storage**: AWS S3 or local file system
-- **Frontend**: React/Vue.js (optional) or vanilla JavaScript
-- **Testing**: WebSocket testing, integration tests
+- **Database**: MongoDB (messages, rooms), Redis (sessions, presence)
+- **File Storage**: AWS S3 SDK or local file system
+- **Frontend**: React.js (optional) or vanilla JavaScript
+- **Message Queue**: Redis Pub/Sub for horizontal scaling
+- **Testing**: WebSocket testing, TestContainers, Selenium
+- **Build**: Maven
+- **Monitoring**: Spring Boot Actuator, Micrometer
+
+#### 📚 Required Knowledge
+**Prerequisites:**
+- Completion of previous projects
+- Understanding of WebSocket protocol
+- Basic knowledge of JavaScript/React
+- Real-time application concepts
+- Redis fundamentals
+
+**Spring Concepts to Learn:**
+- Spring WebSocket configuration
+- STOMP protocol implementation
+- WebSocket security
+- Session management with Redis
+- File upload handling
+- Real-time event broadcasting
+
+#### 🚀 Getting Started Guide
+
+**Step 1: Project Setup**
+```bash
+# Create Spring Boot project with WebSocket dependencies
+curl https://start.spring.io/starter.zip \
+  -d dependencies=websocket,data-mongodb,data-redis,security,web,validation \
+  -d bootVersion=3.1.0 \
+  -d javaVersion=17 \
+  -d artifactId=chat-application \
+  -d packageName=com.yourname.chat \
+  -o chat-application.zip
+
+unzip chat-application.zip && cd chat-application
+```
+
+**Step 2: Application Configuration**
+```yaml
+# application.yml
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/chatdb
+      auto-index-creation: true
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+
+server:
+  port: 8080
+
+chat:
+  file-storage:
+    type: local # or s3
+    local-path: ./uploads
+    s3:
+      bucket-name: chat-files
+      region: us-east-1
+
+logging:
+  level:
+    com.yourname.chat: DEBUG
+    org.springframework.web.socket: DEBUG
+```
+
+#### 📁 Project Structure
+```
+src/
+├── main/
+│   ├── java/com/yourname/chat/
+│   │   ├── ChatApplication.java
+│   │   ├── config/
+│   │   │   ├── WebSocketConfig.java
+│   │   │   ├── SecurityConfig.java
+│   │   │   ├── RedisConfig.java
+│   │   │   └── FileStorageConfig.java
+│   │   ├── controller/
+│   │   │   ├── ChatController.java
+│   │   │   ├── RoomController.java
+│   │   │   ├── UserController.java
+│   │   │   └── FileController.java
+│   │   ├── websocket/
+│   │   │   ├── ChatMessageHandler.java
+│   │   │   ├── WebSocketEventListener.java
+│   │   │   └── UserPresenceService.java
+│   │   ├── service/
+│   │   │   ├── ChatService.java
+│   │   │   ├── RoomService.java
+│   │   │   ├── UserService.java
+│   │   │   ├── FileStorageService.java
+│   │   │   └── NotificationService.java
+│   │   ├── repository/
+│   │   │   ├── MessageRepository.java
+│   │   │   ├── RoomRepository.java
+│   │   │   └── UserRepository.java
+│   │   ├── entity/
+│   │   │   ├── ChatMessage.java
+│   │   │   ├── ChatRoom.java
+│   │   │   ├── User.java
+│   │   │   └── FileAttachment.java
+│   │   ├── dto/
+│   │   │   ├── MessageDto.java
+│   │   │   ├── RoomDto.java
+│   │   │   ├── UserPresenceDto.java
+│   │   │   └── FileUploadResponse.java
+│   │   └── exception/
+│   │       ├── ChatException.java
+│   │       └── FileStorageException.java
+│   └── resources/
+│       ├── application.yml
+│       ├── static/
+│       │   ├── js/
+│       │   │   ├── chat.js
+│       │   │   ├── websocket-client.js
+│       │   │   └── file-upload.js
+│       │   ├── css/
+│       │   │   └── chat.css
+│       │   └── index.html
+│       └── templates/
+└── test/
+    └── java/com/yourname/chat/
+        ├── websocket/
+        │   └── ChatWebSocketTest.java
+        ├── service/
+        │   ├── ChatServiceTest.java
+        │   └── FileStorageServiceTest.java
+        └── integration/
+            └── ChatIntegrationTest.java
+```
+
+#### ⚙️ Implementation Steps
+
+**Phase 1: WebSocket Foundation (Week 1)**
+1. Configure WebSocket with STOMP
+2. Set up basic message broadcasting
+3. Implement user authentication
+4. Create simple chat interface
+5. Add message persistence to MongoDB
+
+**Phase 2: Advanced Features (Week 2-3)**
+1. Implement chat rooms
+2. Add user presence tracking
+3. File upload and sharing
+4. Message history and pagination
+5. Private messaging
+
+**Phase 3: Real-time Features (Week 3-4)**
+1. Typing indicators
+2. Message read receipts
+3. User online status
+4. Push notifications
+5. Message reactions/emojis
+
+**Phase 4: Scaling & Production (Week 4-5)**
+1. Redis session clustering
+2. Horizontal scaling support
+3. Rate limiting and abuse prevention
+4. Comprehensive testing
+5. Performance optimization
+
+**Key Code Examples:**
+
+```java
+// WebSocket Configuration
+@Configuration
+@EnableWebSocketMessageBroker
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+    
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/topic", "/user");
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user");
+    }
+    
+    @Override
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
+    }
+}
+
+// Chat Controller
+@Controller
+@Validated
+public class ChatController {
+    
+    private final ChatService chatService;
+    private final SimpMessagingTemplate messagingTemplate;
+    
+    @MessageMapping("/chat.sendMessage")
+    public void sendMessage(@Valid ChatMessage chatMessage, Principal principal) {
+        chatMessage.setSender(principal.getName());
+        chatMessage.setTimestamp(Instant.now());
+        
+        ChatMessage savedMessage = chatService.saveMessage(chatMessage);
+        
+        // Broadcast to room subscribers
+        messagingTemplate.convertAndSend(
+            "/topic/room/" + chatMessage.getRoomId(), 
+            savedMessage
+        );
+        
+        // Send typing stop indicator
+        messagingTemplate.convertAndSend(
+            "/topic/room/" + chatMessage.getRoomId() + "/typing",
+            new TypingIndicator(principal.getName(), false)
+        );
+    }
+    
+    @MessageMapping("/chat.typing")
+    public void handleTyping(@Valid TypingIndicator indicator, Principal principal) {
+        indicator.setUsername(principal.getName());
+        messagingTemplate.convertAndSend(
+            "/topic/room/" + indicator.getRoomId() + "/typing",
+            indicator
+        );
+    }
+}
+
+// Message Entity
+@Document(collection = "messages")
+public class ChatMessage {
+    @Id
+    private String id;
+    
+    @NotBlank
+    private String content;
+    
+    @NotBlank
+    private String sender;
+    
+    @NotBlank
+    private String roomId;
+    
+    private Instant timestamp;
+    
+    @DBRef
+    private List<FileAttachment> attachments = new ArrayList<>();
+    
+    private MessageType type = MessageType.CHAT;
+    
+    private Set<String> readBy = new HashSet<>();
+    
+    private Map<String, String> reactions = new HashMap<>();
+    
+    // Constructors, getters, setters
+}
+
+// User Presence Service
+@Service
+public class UserPresenceService {
+    
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final SimpMessagingTemplate messagingTemplate;
+    
+    private static final String PRESENCE_KEY = "user:presence:";
+    private static final Duration PRESENCE_TIMEOUT = Duration.ofMinutes(5);
+    
+    public void setUserOnline(String username, String sessionId) {
+        UserPresence presence = new UserPresence();
+        presence.setUsername(username);
+        presence.setStatus(UserStatus.ONLINE);
+        presence.setSessionId(sessionId);
+        presence.setLastSeen(Instant.now());
+        
+        redisTemplate.opsForValue().set(
+            PRESENCE_KEY + username, 
+            presence, 
+            PRESENCE_TIMEOUT
+        );
+        
+        // Broadcast user online status
+        messagingTemplate.convertAndSend("/topic/presence", presence);
+    }
+    
+    @EventListener
+    public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
+        String username = getUsernameFromSession(event.getSessionId());
+        if (username != null) {
+            setUserOffline(username);
+        }
+    }
+    
+    private void setUserOffline(String username) {
+        UserPresence presence = getUserPresence(username);
+        if (presence != null) {
+            presence.setStatus(UserStatus.OFFLINE);
+            presence.setLastSeen(Instant.now());
+            
+            redisTemplate.opsForValue().set(PRESENCE_KEY + username, presence);
+            messagingTemplate.convertAndSend("/topic/presence", presence);
+        }
+    }
+}
+
+// File Storage Service
+@Service
+public class FileStorageService {
+    
+    @Value("${chat.file-storage.type}")
+    private String storageType;
+    
+    @Value("${chat.file-storage.local-path}")
+    private String localPath;
+    
+    private final AmazonS3 amazonS3;
+    
+    public FileUploadResponse uploadFile(MultipartFile file, String roomId) {
+        validateFile(file);
+        
+        String fileName = generateUniqueFileName(file.getOriginalFilename());
+        String fileUrl;
+        
+        try {
+            if ("s3".equals(storageType)) {
+                fileUrl = uploadToS3(file, fileName, roomId);
+            } else {
+                fileUrl = uploadToLocal(file, fileName, roomId);
+            }
+            
+            FileAttachment attachment = new FileAttachment();
+            attachment.setOriginalName(file.getOriginalFilename());
+            attachment.setFileName(fileName);
+            attachment.setFileUrl(fileUrl);
+            attachment.setFileSize(file.getSize());
+            attachment.setContentType(file.getContentType());
+            attachment.setUploadedAt(Instant.now());
+            
+            return new FileUploadResponse(attachment);
+            
+        } catch (Exception e) {
+            throw new FileStorageException("Failed to upload file", e);
+        }
+    }
+    
+    private String uploadToS3(MultipartFile file, String fileName, String roomId) throws IOException {
+        String key = "chat-files/" + roomId + "/" + fileName;
+        
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
+        
+        PutObjectRequest request = new PutObjectRequest(bucketName, key, file.getInputStream(), metadata);
+        amazonS3.putObject(request);
+        
+        return amazonS3.getUrl(bucketName, key).toString();
+    }
+}
+```
 
 ---
 
@@ -884,77 +982,853 @@ public class GatewayConfig {
 
 #### 📋 Project Overview
 **Duration:** 5-6 weeks  
-**Description:** A full-featured CMS with article management, user roles, media handling, and SEO optimization.  
-**Business Value:** Learn advanced Spring Security, file handling, and content management patterns.
-
----
-
-## 🔥 ADVANCED LEVEL PROJECTS
-*Focus: Enterprise Architecture, Performance, Scalability, Production-Ready Applications*
-
-### 🔴 Project 7: Multi-tenant SaaS Platform
-
-#### 📋 Project Overview
-**Duration:** 8-10 weeks  
-**Description:** An enterprise-grade SaaS platform supporting multiple tenants with isolated data, custom configurations, and billing integration.  
-**Business Value:** Learn multi-tenancy patterns, enterprise security, and SaaS architecture.
+**Description:** A full-featured CMS with article management, user roles, media handling, SEO optimization, and multi-language support.  
+**Business Value:** Learn advanced Spring Security, file handling, content management patterns, and enterprise-grade features.
 
 #### 🏗️ Architecture Design
 ```
-                    ┌─────────────────┐
-                    │   Load Balancer │
-                    │   (Nginx/AWS)   │
-                    └─────────┬───────┘
-                              │
-                    ┌─────────▼───────┐
-                    │   API Gateway   │
-                    │  + Tenant       │
-                    │  Resolution     │
-                    └─────────┬───────┘
-                              │
-        ┌─────────────────────┼─────────────────────┐
-        │                     │                     │
-┌───────▼────────┐   ┌────────▼────────┐   ┌───────▼────────┐
-│   Auth Service │   │  Tenant Service │   │  Core Service  │
-│   (Multi-tenant│   │  (Metadata)     │   │  (Business)    │
-│   + SSO)       │   │                 │   │                │
-└───────┬────────┘   └────────┬────────┘   └───────┬────────┘
-        │                     │                     │
-        └─────────────────────┼─────────────────────┘
-                              │
-              ┌───────────────▼───────────────┐
-              │      Database Cluster         │
-              │  ┌─────────┬─────────────────┐│
-              │  │Tenant A │ Tenant B │ ... ││
-              │  │Schema   │ Schema   │     ││
-              │  └─────────┴─────────────────┘│
-              └───────────────────────────────┘
+                     ┌─────────────────┐
+                     │   CDN / Nginx   │
+                     │  (Static Files) │
+                     └─────────┬───────┘
+                               │
+                     ┌─────────▼───────┐
+                     │  Load Balancer  │
+                     │   (HAProxy)     │
+                     └─────────┬───────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+┌───────▼────────┐    ┌────────▼────────┐    ┌───────▼────────┐
+│  Admin Panel   │    │   Public API    │    │  Content API   │
+│  (Angular)     │    │  (REST/GraphQL) │    │   (Mobile)     │
+└───────┬────────┘    └────────┬────────┘    └───────┬────────┘
+        │                      │                      │
+        └──────────────────────┼──────────────────────┘
+                               │
+                     ┌─────────▼────────┐
+                     │   Spring Boot    │
+                     │   CMS Backend    │
+                     └─────────┬────────┘
+                               │
+        ┌──────────────────────┼──────────────────────┐
+        │                      │                      │
+┌───────▼───────┐    ┌─────────▼────────┐    ┌───────▼────────┐
+│  PostgreSQL   │    │   Elasticsearch  │    │  File Storage  │
+│  (Content,    │    │   (Search &      │    │  (Images,      │
+│   Users,      │    │    Analytics)    │    │   Documents)   │
+│   Metadata)   │    │                  │    │                │
+└───────────────┘    └──────────────────┘    └────────────────┘
+                               │
+                     ┌─────────▼────────┐
+                     │     Redis        │
+                     │  (Cache, Sessions)│
+                     └──────────────────┘
 ```
 
 #### 🛠️ Technology Stack
-- **Core**: Spring Boot, Spring Cloud, Spring Security
-- **Multi-tenancy**: Hibernate Multi-tenancy, Schema per tenant
-- **Database**: PostgreSQL with schema separation
-- **Caching**: Redis with tenant isolation
-- **Search**: Elasticsearch with tenant indexing
-- **Monitoring**: Prometheus, Grafana, ELK Stack
-- **Infrastructure**: Kubernetes, Helm charts
-- **CI/CD**: Jenkins/GitHub Actions, Docker
+- **Core**: Spring Boot 3.x, Spring MVC, Spring Data JPA
+- **Security**: Spring Security, OAuth2, JWT, Multi-factor Authentication
+- **Database**: PostgreSQL (primary), Elasticsearch (search), Redis (cache)
+- **File Storage**: AWS S3, CloudFront CDN
+- **Template Engine**: Thymeleaf (admin), React.js (frontend)
+- **Search**: Elasticsearch with custom analyzers
+- **Caching**: Redis, Spring Cache
+- **Build**: Maven (multi-module)
+- **Testing**: JUnit 5, TestContainers, Selenium
+- **Monitoring**: Spring Boot Actuator, Micrometer, ELK Stack
 
 #### 📚 Required Knowledge
 **Prerequisites:**
-- Advanced Spring Security knowledge
-- Database administration skills
-- Kubernetes basics
-- Performance optimization
-- Enterprise integration patterns
+- Advanced Spring Boot and Spring Security
+- Database design and optimization
+- Elasticsearch fundamentals
+- File storage and CDN concepts
+- Frontend development basics
+- SEO principles
 
-**Advanced Concepts:**
-- Multi-tenancy strategies
-- Data isolation patterns
-- Horizontal scaling
-- Performance monitoring
-- Security compliance (SOC2, GDPR)
+**Advanced Concepts to Learn:**
+- Multi-level security (method, URL, data)
+- Content versioning and workflow
+- Full-text search implementation
+- Image processing and optimization
+- Caching strategies (multi-level)
+- Internationalization (i18n)
+- SEO optimization techniques
+
+#### 🚀 Getting Started Guide
+
+**Step 1: Multi-Module Project Setup**
+```xml
+<!-- Parent pom.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <groupId>com.yourname.cms</groupId>
+    <artifactId>cms-platform</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    
+    <modules>
+        <module>cms-core</module>
+        <module>cms-api</module>
+        <module>cms-admin</module>
+        <module>cms-search</module>
+        <module>cms-common</module>
+    </modules>
+    
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <spring-boot.version>3.1.0</spring-boot.version>
+        <elasticsearch.version>8.7.0</elasticsearch.version>
+    </properties>
+</project>
+```
+
+**Step 2: Core Application Configuration**
+```yaml
+# application.yml
+spring:
+  application:
+    name: cms-platform
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:development}
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cms_db
+    username: ${DB_USERNAME:cms_user}
+    password: ${DB_PASSWORD:password}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 25
+          order_inserts: true
+          order_updates: true
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+
+elasticsearch:
+  uris: ${ELASTICSEARCH_URI:http://localhost:9200}
+  username: ${ELASTICSEARCH_USERNAME:}
+  password: ${ELASTICSEARCH_PASSWORD:}
+
+cms:
+  file-storage:
+    provider: s3
+    s3:
+      bucket-name: ${S3_BUCKET_NAME:cms-files}
+      region: ${AWS_REGION:us-east-1}
+      cloudfront-domain: ${CLOUDFRONT_DOMAIN:}
+  
+  cache:
+    content-ttl: 3600
+    media-ttl: 86400
+    search-ttl: 1800
+  
+  seo:
+    sitemap:
+      enabled: true
+      base-url: ${BASE_URL:http://localhost:8080}
+    
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+```
+
+#### 📁 Project Structure
+```
+cms-platform/
+├── pom.xml
+├── docker-compose.yml
+├── cms-core/
+│   ├── pom.xml
+│   └── src/main/java/com/yourname/cms/core/
+│       ├── entity/
+│       │   ├── Content.java
+│       │   ├── Category.java
+│       │   ├── Tag.java
+│       │   ├── User.java
+│       │   ├── Role.java
+│       │   ├── MediaFile.java
+│       │   └── Comment.java
+│       ├── repository/
+│       ├── service/
+│       └── config/
+├── cms-api/
+│   ├── pom.xml
+│   └── src/main/java/com/yourname/cms/api/
+│       ├── CmsApiApplication.java
+│       ├── controller/
+│       │   ├── ContentController.java
+│       │   ├── CategoryController.java
+│       │   ├── MediaController.java
+│       │   ├── UserController.java
+│       │   └── SearchController.java
+│       ├── dto/
+│       ├── security/
+│       └── exception/
+├── cms-admin/
+│   ├── pom.xml
+│   └── src/main/java/com/yourname/cms/admin/
+│       ├── CmsAdminApplication.java
+│       ├── controller/
+│       ├── service/
+│       └── config/
+├── cms-search/
+│   ├── pom.xml
+│   └── src/main/java/com/yourname/cms/search/
+│       ├── service/
+│       │   ├── SearchService.java
+│       │   ├── IndexingService.java
+│       │   └── AnalyticsService.java
+│       ├── document/
+│       │   ├── ContentDocument.java
+│       │   └── MediaDocument.java
+│       └── repository/
+└── cms-common/
+    └── src/main/java/com/yourname/cms/common/
+        ├── dto/
+        ├── exception/
+        ├── util/
+        └── constant/
+```
+
+#### ⚙️ Implementation Steps
+
+**Phase 1: Core Foundation (Week 1-2)**
+1. Design database schema with versioning
+2. Implement user management and roles
+3. Create content entities and repositories
+4. Set up basic CRUD operations
+5. Configure security and authentication
+
+**Phase 2: Content Management (Week 2-3)**
+1. Implement content creation workflow
+2. Add rich text editor integration
+3. Media file upload and processing
+4. Content versioning and revision history
+5. Category and tag management
+
+**Phase 3: Advanced Features (Week 3-4)**
+1. Full-text search with Elasticsearch
+2. Content publishing workflow
+3. Multi-language support
+4. SEO optimization features
+5. Caching implementation
+
+**Phase 4: Admin Interface (Week 4-5)**
+1. Admin dashboard development
+2. Content analytics and reporting
+3. User management interface
+4. System configuration
+5. Backup and restore features
+
+**Phase 5: Performance & Production (Week 5-6)**
+1. Performance optimization
+2. CDN integration
+3. Monitoring and alerting
+4. Security hardening
+5. Deployment automation
+
+**Key Code Examples:**
+
+```java
+// Content Entity with Versioning
+@Entity
+@Table(name = "contents")
+@EntityListeners(AuditingEntityListener.class)
+public class Content {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    @NotBlank
+    @Size(max = 200)
+    private String title;
+    
+    @Column(unique = true)
+    private String slug;
+    
+    @Lob
+    private String content;
+    
+    @Lob
+    private String excerpt;
+    
+    @Enumerated(EnumType.STRING)
+    private ContentStatus status = ContentStatus.DRAFT;
+    
+    @Enumerated(EnumType.STRING)
+    private ContentType type = ContentType.ARTICLE;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private User author;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
+    
+    @ManyToMany
+    @JoinTable(
+        name = "content_tags",
+        joinColumns = @JoinColumn(name = "content_id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags = new HashSet<>();
+    
+    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ContentVersion> versions = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "content", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MediaFile> mediaFiles = new ArrayList<>();
+    
+    // SEO fields
+    private String metaTitle;
+    private String metaDescription;
+    private String metaKeywords;
+    private String canonicalUrl;
+    
+    // Audit fields
+    @CreatedDate
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+    
+    @CreatedBy
+    private String createdBy;
+    
+    @LastModifiedBy
+    private String lastModifiedBy;
+    
+    private LocalDateTime publishedAt;
+    
+    @Version
+    private Long version;
+    
+    // Constructors, getters, setters
+}
+
+// Advanced Content Service
+@Service
+@Transactional
+public class ContentService {
+    
+    private final ContentRepository contentRepository;
+    private final SearchService searchService;
+    private final CacheManager cacheManager;
+    private final MediaService mediaService;
+    private final NotificationService notificationService;
+    
+    @Cacheable(value = "content", key = "#slug")
+    @Transactional(readOnly = true)
+    public ContentDto getPublishedContentBySlug(String slug) {
+        Content content = contentRepository.findBySlugAndStatus(slug, ContentStatus.PUBLISHED)
+            .orElseThrow(() -> new ContentNotFoundException("Content not found: " + slug));
+        
+        // Track view
+        analyticsService.trackContentView(content.getId());
+        
+        return ContentMapper.toDto(content);
+    }
+    
+    public ContentDto createContent(CreateContentRequest request, String authorUsername) {
+        Content content = new Content();
+        content.setTitle(request.getTitle());
+        content.setSlug(generateSlug(request.getTitle()));
+        content.setContent(request.getContent());
+        content.setExcerpt(extractExcerpt(request.getContent()));
+        content.setType(request.getType());
+        content.setStatus(ContentStatus.DRAFT);
+        
+        User author = userService.findByUsername(authorUsername);
+        content.setAuthor(author);
+        
+        if (request.getCategoryId() != null) {
+            Category category = categoryService.findById(request.getCategoryId());
+            content.setCategory(category);
+        }
+        
+        // Process tags
+        Set<Tag> tags = tagService.processTagNames(request.getTagNames());
+        content.setTags(tags);
+        
+        // SEO optimization
+        content.setMetaTitle(generateMetaTitle(content.getTitle()));
+        content.setMetaDescription(generateMetaDescription(content.getExcerpt()));
+        content.setCanonicalUrl(generateCanonicalUrl(content.getSlug()));
+        
+        Content savedContent = contentRepository.save(content);
+        
+        // Create initial version
+        createContentVersion(savedContent, "Initial version");
+        
+        return ContentMapper.toDto(savedContent);
+    }
+    
+    public ContentDto publishContent(Long contentId, String publisherUsername) {
+        Content content = getContentById(contentId);
+        
+        // Validate publishing permissions
+        if (!canPublishContent(publisherUsername, content)) {
+            throw new InsufficientPermissionException("Cannot publish this content");
+        }
+        
+        content.setStatus(ContentStatus.PUBLISHED);
+        content.setPublishedAt(LocalDateTime.now());
+        
+        Content publishedContent = contentRepository.save(content);
+        
+        // Index in Elasticsearch
+        searchService.indexContent(publishedContent);
+        
+        // Clear cache
+        cacheManager.evict("content", content.getSlug());
+        
+        // Send notifications
+        notificationService.notifyContentPublished(publishedContent);
+        
+        // Generate sitemap
+        sitemapService.updateSitemap();
+        
+        return ContentMapper.toDto(publishedContent);
+    }
+}
+
+// Elasticsearch Search Service
+@Service
+public class SearchService {
+    
+    private final ElasticsearchOperations elasticsearchOperations;
+    private final ContentRepository contentRepository;
+    
+    public void indexContent(Content content) {
+        ContentDocument document = new ContentDocument();
+        document.setId(content.getId().toString());
+        document.setTitle(content.getTitle());
+        document.setContent(stripHtml(content.getContent()));
+        document.setExcerpt(content.getExcerpt());
+        document.setAuthor(content.getAuthor().getDisplayName());
+        document.setCategory(content.getCategory().getName());
+        document.setTags(content.getTags().stream()
+            .map(Tag::getName)
+            .collect(Collectors.toList()));
+        document.setPublishedAt(content.getPublishedAt());
+        document.setStatus(content.getStatus().name());
+        
+        elasticsearchOperations.save(document);
+    }
+    
+    public SearchResult<ContentDto> searchContent(String query, SearchFilters filters, Pageable pageable) {
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        
+        // Full-text search
+        if (StringUtils.hasText(query)) {
+            MultiMatchQueryBuilder multiMatchQuery = QueryBuilders.multiMatchQuery(query)
+                .field("title", 3.0f)
+                .field("content", 1.0f)
+                .field("excerpt", 2.0f)
+                .field("tags", 1.5f)
+                .type(MultiMatchQueryBuilder.Type.BEST_FIELDS)
+                .fuzziness(Fuzziness.AUTO);
+            boolQuery.must(multiMatchQuery);
+        }
+        
+        // Apply filters
+        if (filters.getCategory() != null) {
+            boolQuery.filter(QueryBuilders.termQuery("category", filters.getCategory()));
+        }
+        
+        if (filters.getTags() != null && !filters.getTags().isEmpty()) {
+            boolQuery.filter(QueryBuilders.termsQuery("tags", filters.getTags()));
+        }
+        
+        if (filters.getDateFrom() != null) {
+            boolQuery.filter(QueryBuilders.rangeQuery("publishedAt")
+                .gte(filters.getDateFrom()));
+        }
+        
+        // Only published content
+        boolQuery.filter(QueryBuilders.termQuery("status", "PUBLISHED"));
+        
+        // Highlighting
+        HighlightBuilder highlightBuilder = new HighlightBuilder()
+            .field("title")
+            .field("content")
+            .field("excerpt")
+            .preTags("<mark>")
+            .postTags("</mark>");
+        
+        NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
+            .withQuery(boolQuery)
+            .withPageable(pageable)
+            .withHighlightBuilder(highlightBuilder)
+            .withSort(SortBuilders.scoreSort().order(SortOrder.DESC))
+            .build();
+        
+        SearchHits<ContentDocument> searchHits = elasticsearchOperations.search(searchQuery, ContentDocument.class);
+        
+        List<ContentDto> results = searchHits.stream()
+            .map(hit -> {
+                ContentDocument doc = hit.getContent();
+                ContentDto dto = ContentMapper.toDto(doc);
+                
+                // Add highlights
+                Map<String, List<String>> highlights = hit.getHighlightFields();
+                if (highlights.containsKey("title")) {
+                    dto.setHighlightedTitle(highlights.get("title").get(0));
+                }
+                if (highlights.containsKey("content")) {
+                    dto.setHighlightedExcerpt(highlights.get("content").get(0));
+                }
+                
+                return dto;
+            })
+            .collect(Collectors.toList());
+        
+        return new SearchResult<>(results, searchHits.getTotalHits(), pageable);
+    }
+}
+
+// Multi-level Security Configuration
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
+public class SecurityConfig {
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/public/**", "/sitemap.xml", "/robots.txt").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/content/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers("/api/author/**").hasAnyRole("AUTHOR", "EDITOR", "ADMIN")
+                .anyRequest().authenticated()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                .loginPage("/login")
+                .defaultSuccessUrl("/dashboard")
+                .userInfoEndpoint(userInfo -> userInfo
+                    .userService(customOAuth2UserService)
+                )
+            )
+            .jwt(jwt -> jwt
+                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+            )
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(false)
+            )
+            .csrf(csrf -> csrf
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                .ignoringRequestMatchers("/api/**")
+            );
+        
+        return http.build();
+    }
+    
+    @Bean
+    @PreAuthorize("hasRole('ADMIN')")
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+```
+
+---
+
+## 🔥 ENTERPRISE LEVEL PROJECTS
+*Target: Senior to Lead positions • Focus: Mission-critical systems and advanced optimization*
+
+### 🔴 Project 7: Multi-Tenant Cloud-Native SaaS Platform
+
+#### 📋 Project Overview
+**Duration:** 8-10 weeks | **Market Value:** Premium+  
+**Description:** An enterprise-grade multi-tenant SaaS platform with advanced tenant isolation, custom branding, usage-based billing, and global deployment capabilities.  
+**Business Value:** Demonstrates expertise in SaaS architecture, cloud-native development, and enterprise-scale platform engineering.
+
+#### 💼 **Enterprise SaaS Features That Command High Salaries**
+- **Advanced multi-tenancy patterns** (Schema-per-tenant, database-per-tenant)
+- **Custom tenant branding and configuration** (White-label SaaS capabilities)
+- **Usage-based billing and metering** (Subscription and revenue optimization)
+- **Global multi-region deployment** (Disaster recovery and compliance)
+- **Advanced security and compliance** (SOC 2, GDPR, ISO 27001 ready)
+- **Tenant lifecycle management** (Onboarding, migration, deletion)
+- **Performance isolation and SLA management** (Enterprise-grade guarantees)
+- **Advanced analytics and reporting** (Tenant usage insights and optimization)
+
+#### 🏗️ Cloud-Native Architecture
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Global Load Balancer (Route 53)              │
+└─────────────────────┬───────────────────┬───────────────────────┘
+                      │                   │
+              ┌───────▼────────┐ ┌────────▼────────┐
+              │   US-East-1    │ │   EU-West-1     │
+              │   (Primary)    │ │   (Secondary)   │
+              └───────┬────────┘ └────────┬────────┘
+                      │                   │
+    ┌─────────────────┼───────────────────┼─────────────────┐
+    │                 │                   │                 │
+┌───▼───┐    ┌────────▼────────┐    ┌─────▼────┐    ┌──────▼────┐
+│  CDN  │    │  API Gateway    │    │  Service │    │   Data    │
+│(CF/CW)│    │  + WAF + DDoS   │    │   Mesh   │    │   Layer   │
+└───────┘    └────────┬────────┘    └─────┬────┘    └──────┬────┘
+                      │                   │                │
+             ┌────────▼────────┐         │         ┌──────▼────┐
+             │  Kubernetes     │         │         │ Database  │
+             │  Cluster        │         │         │ Cluster   │
+             │  (Auto-scaling) │         │         │(Multi-AZ) │
+             └─────────────────┘         │         └───────────┘
+                                        │
+                              ┌─────────▼────────┐
+                              │  Monitoring &    │
+                              │  Observability   │
+                              │  (Prometheus +   │
+                              │   Grafana + ELK) │
+                              └──────────────────┘
+```
+
+#### 🛠️ Enterprise Cloud-Native Stack
+- **Platform**: Kubernetes, Helm, Istio Service Mesh
+- **Core**: Spring Boot 3.x, Spring Cloud, Spring WebFlux
+- **Security**: OAuth2, OIDC, Keycloak, Vault for secrets
+- **Data**: PostgreSQL (multi-tenant), Redis Cluster, Elasticsearch
+- **Messaging**: Apache Kafka, AWS SQS, CloudEvents
+- **Monitoring**: Prometheus, Grafana, Jaeger, ELK Stack
+- **CI/CD**: GitOps (ArgoCD), Tekton, GitHub Actions
+- **Cloud**: AWS/Azure/GCP, Terraform, CDN, WAF
+
+#### 💰 **Enterprise Business Impact**
+- **Revenue Growth**: Enables $10M+ ARR through scalable tenant onboarding
+- **Cost Optimization**: 60% reduction in per-tenant infrastructure costs
+- **Global Reach**: 99.99% availability across multiple regions
+- **Security Compliance**: SOC 2 Type II, GDPR, HIPAA ready
+- **Developer Productivity**: 50% faster feature delivery through automation
+- **Customer Satisfaction**: Sub-second response times globally
+
+---
+
+### 🔴 Project 8: AI-Powered Fraud Detection System
+
+#### 📋 Project Overview
+**Duration:** 10-12 weeks | **Market Value:** Exceptional  
+**Description:** Real-time fraud detection system with machine learning models, risk scoring, and automated decision engines for financial transactions.  
+**Business Value:** Combines Spring expertise with AI/ML, demonstrating cutting-edge technology integration.
+
+#### 💼 **AI/ML Enterprise Features**
+- **Real-time ML model serving** (TensorFlow Serving, MLflow integration)
+- **Feature engineering pipelines** (Real-time and batch feature computation)
+- **A/B testing for model performance** (Champion/challenger model deployment)
+- **Explainable AI for compliance** (SHAP, LIME integration for decision transparency)
+- **Model monitoring and drift detection** (Data drift and model performance monitoring)
+- **Real-time risk scoring** (Sub-millisecond decision making)
+- **Automated model retraining** (MLOps pipeline with continuous learning)
+- **Regulatory compliance reporting** (AML, KYC, and fraud prevention requirements)
+
+#### 🛠️ AI/ML Technology Stack
+- **Core**: Spring Boot, Spring WebFlux, Spring AI
+- **ML/AI**: TensorFlow, PyTorch, Scikit-learn, MLflow
+- **Real-time**: Apache Kafka, Redis Streams, Apache Flink
+- **Data**: ClickHouse (time-series), PostgreSQL, Feature Store
+- **Monitoring**: Custom ML metrics, Prometheus, Grafana
+- **Deployment**: Kubernetes, Kubeflow, model serving platforms
+
+---
+
+### 🔴 Project 9: Global Supply Chain Management Platform
+
+#### 📋 Project Overview
+**Duration:** 8-10 weeks | **Market Value:** Very High  
+**Description:** Enterprise supply chain platform with IoT integration, blockchain for traceability, and predictive analytics for demand forecasting.  
+**Business Value:** Demonstrates IoT, blockchain, and enterprise integration capabilities.
+
+#### 💼 **Supply Chain Enterprise Features**
+- **IoT device integration and management** (MQTT, CoAP protocols)
+- **Blockchain-based traceability** (Hyperledger Fabric integration)
+- **Predictive analytics for demand** (Time-series forecasting)
+- **Global warehouse management** (Multi-location inventory optimization)
+- **Supplier relationship management** (B2B integration and EDI)
+- **Real-time shipment tracking** (GPS and RFID integration)
+- **Compliance and sustainability reporting** (ESG metrics and reporting)
+- **Supply chain risk assessment** (Risk modeling and mitigation strategies)
+
+---
+
+## 📈 Enterprise Portfolio Strategy
+
+### 🎯 **Strategic Project Selection for Maximum Career Impact**
+
+#### **Foundation Portfolio (Entry to Mid-level)**
+1. **Enterprise Task Management** → Demonstrates clean code and security
+2. **Digital Banking System** → Shows financial domain expertise
+3. **E-Learning Platform** → Proves full-stack capabilities
+
+**Expected Outcome**: $70K-$90K salary range, strong technical foundation
+
+#### **Professional Portfolio (Mid to Senior-level)**
+1. **E-commerce Microservices** → Advanced architecture skills
+2. **Financial Trading Platform** → High-performance system expertise
+3. **Healthcare Management** → Domain-specific compliance knowledge
+
+**Expected Outcome**: $90K-$130K salary range, architectural leadership
+
+#### **Enterprise Portfolio (Senior to Lead-level)**
+1. **Multi-Tenant SaaS Platform** → Platform engineering expertise
+2. **AI-Powered Fraud Detection** → Cutting-edge technology integration
+3. **Supply Chain Management** → Complex business domain mastery
+
+**Expected Outcome**: $130K-$200K+ salary range, technical leadership roles
+
+### 💡 **Career Acceleration Strategies**
+
+#### **Technical Leadership Demonstration**
+- **Open Source Contributions**: Publish reusable Spring libraries
+- **Technical Writing**: Create authoritative blog posts and tutorials
+- **Conference Speaking**: Present at Java/Spring conferences
+- **Mentoring**: Lead technical discussions and code reviews
+- **Innovation**: Contribute to Spring ecosystem projects
+
+#### **Business Impact Documentation**
+- **Performance Metrics**: Document measurable improvements
+- **Cost Savings**: Quantify infrastructure and development savings
+- **Revenue Impact**: Show business value of technical decisions
+- **Risk Mitigation**: Demonstrate security and compliance expertise
+- **Team Productivity**: Measure developer experience improvements
+
+#### **Market Positioning**
+- **Specialization**: Choose 2-3 domains (fintech, healthcare, e-commerce)
+- **Technology Expertise**: Become known for specific Spring capabilities
+- **Thought Leadership**: Build reputation through content and community
+- **Network Building**: Connect with industry leaders and hiring managers
+- **Continuous Learning**: Stay current with Spring and enterprise trends
+
+### 🏆 **Success Metrics and Career Milestones**
+
+#### **Technical Milestones**
+- [ ] 10+ production-ready projects in portfolio
+- [ ] 95%+ test coverage across all projects
+- [ ] Sub-100ms API response times consistently
+- [ ] Zero critical security vulnerabilities
+- [ ] Kubernetes deployment expertise
+- [ ] CI/CD pipeline mastery
+
+#### **Career Milestones**
+- [ ] Spring Professional Certification
+- [ ] 1000+ GitHub stars across projects
+- [ ] 10+ technical blog posts published
+- [ ] Speaking at 2+ conferences/meetups
+- [ ] Mentoring 5+ junior developers
+- [ ] Leading architecture decisions
+
+#### **Financial Milestones**
+- [ ] Entry-level: $70K-$90K (Foundation projects)
+- [ ] Mid-level: $90K-$130K (Professional projects)
+- [ ] Senior-level: $130K-$170K (Enterprise projects)
+- [ ] Lead-level: $170K-$220K+ (Principal engineer)
+- [ ] Consulting rates: $150-$300/hour
+- [ ] Stock options and equity participation
+
+---
+
+## 🚀 Implementation Roadmap
+
+### 📅 **12-Month Career Acceleration Plan**
+
+#### **Months 1-3: Foundation Building**
+- Complete Enterprise Task Management API
+- Build Digital Banking System Backend
+- Master Spring Security and testing patterns
+- Create professional GitHub profile
+- Start technical blog
+
+#### **Months 4-6: Professional Development**
+- Build E-commerce Microservices Platform
+- Learn Kubernetes and cloud deployment
+- Contribute to open source projects
+- Network with Spring community
+- Apply for mid-level positions
+
+#### **Months 7-9: Enterprise Expertise**
+- Develop Multi-Tenant SaaS Platform
+- Master performance optimization
+- Lead technical discussions
+- Speak at local meetups
+- Target senior-level roles
+
+#### **Months 10-12: Market Leadership**
+- Complete AI-Powered system
+- Establish thought leadership
+- Mentor other developers
+- Consider consulting opportunities
+- Achieve principal engineer level
+
+### 🎯 **Success Strategy Summary**
+
+The key to maximizing career growth with these projects is to:
+
+1. **Focus on Business Value**: Always articulate the business impact
+2. **Demonstrate Scale**: Show ability to handle enterprise-level complexity
+3. **Prove Security Expertise**: Security is non-negotiable in enterprise
+4. **Show Performance Optimization**: Sub-second response times matter
+5. **Document Everything**: Professional documentation shows maturity
+6. **Test Comprehensively**: High test coverage demonstrates quality
+7. **Deploy to Production**: Real deployment experience is crucial
+8. **Measure and Monitor**: Observability shows operational maturity
+
+These projects are specifically designed to prepare you for high-paying enterprise positions and provide the technical depth that senior hiring managers seek. Each project builds on the previous ones while introducing new concepts that align with market demands and career progression paths.
 
 #### ⚙️ Implementation Steps
 
@@ -1098,23 +1972,6 @@ public class TenantInterceptor implements HandlerInterceptor {
 - Implement caching strategies
 - Monitor query performance
 
-#### **Caching Strategy**
-```java
-@Service
-public class ProductService {
-    
-    @Cacheable(value = "products", key = "#id")
-    public Product findById(Long id) {
-        return productRepository.findById(id);
-    }
-    
-    @CacheEvict(value = "products", key = "#product.id")
-    public Product save(Product product) {
-        return productRepository.save(product);
-    }
-}
-```
-
 ### 🔐 Security Best Practices
 
 #### **Authentication & Authorization**
@@ -1131,78 +1988,7 @@ public class ProductService {
 - Implement audit logging
 - Follow OWASP guidelines
 
-### 📈 Monitoring & Observability
 
-#### **Application Metrics**
-```java
-@RestController
-public class ProductController {
-    
-    private final MeterRegistry meterRegistry;
-    
-    @GetMapping("/products")
-    @Timed(name = "product.get.time", description = "Product retrieval time")
-    public ResponseEntity<List<Product>> getProducts() {
-        Timer.Sample sample = Timer.start(meterRegistry);
-        try {
-            List<Product> products = productService.findAll();
-            meterRegistry.counter("product.get.success").increment();
-            return ResponseEntity.ok(products);
-        } catch (Exception e) {
-            meterRegistry.counter("product.get.error").increment();
-            throw e;
-        } finally {
-            sample.stop(Timer.builder("product.get.duration").register(meterRegistry));
-        }
-    }
-}
-```
-
-### 🚀 Deployment Strategies
-
-#### **Containerization with Docker**
-```dockerfile
-FROM openjdk:17-jre-slim
-
-COPY target/app.jar app.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "/app.jar"]
-```
-
-#### **Kubernetes Deployment**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: spring-app
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: spring-app
-  template:
-    metadata:
-      labels:
-        app: spring-app
-    spec:
-      containers:
-      - name: spring-app
-        image: your-registry/spring-app:latest
-        ports:
-        - containerPort: 8080
-        env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: "production"
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "250m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
-```
 
 ---
 
