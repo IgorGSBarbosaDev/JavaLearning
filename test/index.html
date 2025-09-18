@@ -233,27 +233,36 @@
             </div>
             
             <div class="comment-modal-body">
-                <div class="comment-form">
-                    <textarea 
-                        id="commentText" 
-                        placeholder="Digite seu comentário sobre este membro da equipe..."
-                        rows="6"
-                        maxlength="500"
-                    ></textarea>
-                    <div class="comment-counter">
-                        <span id="commentCounter">0</span>/500 caracteres
+                <!-- Visualização do comentário -->
+                <div class="comment-display-container" id="commentDisplayContainer">
+                    <div class="comment-content" id="commentContent">
+                        <p id="commentText">Nenhum comentário adicionado ainda.</p>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="comment-action-btn cancel" onclick="closeCommentTab()">Fechar</button>
+                        <button class="comment-action-btn delete" id="deleteBtn" onclick="deleteComment()" style="display: none;">🗑️ Excluir</button>
+                        <button class="comment-action-btn edit" id="editBtn" onclick="enableEditMode()">✏️ Editar Comentário</button>
+                        <button class="comment-action-btn add" id="addBtn" onclick="enableEditMode()" style="display: none;">➕ Adicionar Comentário</button>
                     </div>
                 </div>
                 
-                <div class="comment-actions">
-                    <button class="comment-action-btn cancel" onclick="closeCommentTab()">Cancelar</button>
-                    <button class="comment-action-btn save" onclick="saveComment()">Salvar Comentário</button>
-                </div>
-                
-                <div class="existing-comment" id="existingComment" style="display: none;">
-                    <h3>Comentário Atual:</h3>
-                    <div class="comment-display" id="commentDisplay"></div>
-                    <button class="edit-comment-btn" onclick="editComment()">✏️ Editar</button>
+                <!-- Modo de edição -->
+                <div class="comment-edit-container" id="commentEditContainer" style="display: none;">
+                    <div class="comment-form">
+                        <textarea 
+                            id="commentTextArea" 
+                            placeholder="Digite seu comentário sobre este membro da equipe..."
+                            rows="6"
+                            maxlength="500"
+                        ></textarea>
+                        <div class="comment-counter">
+                            <span id="commentCounter">0</span>/500 caracteres
+                        </div>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="comment-action-btn cancel" onclick="cancelEdit()">Cancelar</button>
+                        <button class="comment-action-btn save" onclick="saveComment()">Salvar Comentário</button>
+                    </div>
                 </div>
             </div>
         </div>

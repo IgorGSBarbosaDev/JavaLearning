@@ -349,10 +349,10 @@ window.addEventListener('load', function() {
     }
 
     // Configurar contador de caracteres
-    const commentText = document.getElementById('commentText');
+    const commentTextArea = document.getElementById('commentTextArea');
     const commentCounter = document.getElementById('commentCounter');
-    if (commentText && commentCounter) {
-        commentText.addEventListener('input', function() {
+    if (commentTextArea && commentCounter) {
+        commentTextArea.addEventListener('input', function() {
             const length = this.value.length;
             commentCounter.textContent = length;
             
@@ -374,9 +374,13 @@ function openCommentTab(memberId) {
     currentMemberId = memberId;
     const overlay = document.getElementById('commentModalOverlay');
     const memberNameElement = document.getElementById('commentMemberName');
+    const commentContent = document.getElementById('commentContent');
     const commentText = document.getElementById('commentText');
-    const existingComment = document.getElementById('existingComment');
-    const commentDisplay = document.getElementById('commentDisplay');
+    const editBtn = document.getElementById('editBtn');
+    const addBtn = document.getElementById('addBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    const commentDisplayContainer = document.getElementById('commentDisplayContainer');
+    const commentEditContainer = document.getElementById('commentEditContainer');
     
     // Obter o nome do membro do input
     const nameInput = document.querySelector(`.team-member:nth-child(${memberId}) .name-input`);
@@ -387,25 +391,50 @@ function openCommentTab(memberId) {
         memberNameElement.textContent = memberName;
     }
     
+    // Mostrar container de visualização e esconder edição
+    if (commentDisplayContainer) {
+        commentDisplayContainer.style.display = 'block';
+    }
+    if (commentEditContainer) {
+        commentEditContainer.style.display = 'none';
+    }
+    
     // Verificar se já existe comentário para este membro
     if (memberComments[memberId]) {
         // Mostrar comentário existente
-        if (existingComment && commentDisplay) {
-            commentDisplay.textContent = memberComments[memberId];
-            existingComment.style.display = 'block';
-        }
-        // Limpar textarea para não confundir
         if (commentText) {
-            commentText.value = '';
+            commentText.textContent = memberComments[memberId];
+        }
+        if (commentContent) {
+            commentContent.classList.remove('empty');
+        }
+        // Mostrar botão de editar e excluir, esconder botão de adicionar
+        if (editBtn) {
+            editBtn.style.display = 'inline-block';
+        }
+        if (deleteBtn) {
+            deleteBtn.style.display = 'inline-block';
+        }
+        if (addBtn) {
+            addBtn.style.display = 'none';
         }
     } else {
-        // Esconder seção de comentário existente
-        if (existingComment) {
-            existingComment.style.display = 'none';
-        }
-        // Limpar textarea
+        // Não há comentário
         if (commentText) {
-            commentText.value = '';
+            commentText.textContent = 'Nenhum comentário adicionado ainda.';
+        }
+        if (commentContent) {
+            commentContent.classList.add('empty');
+        }
+        // Mostrar botão de adicionar e esconder botões de editar/excluir
+        if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+        if (deleteBtn) {
+            deleteBtn.style.display = 'none';
+        }
+        if (addBtn) {
+            addBtn.style.display = 'inline-block';
         }
     }
     
@@ -415,13 +444,6 @@ function openCommentTab(memberId) {
         setTimeout(() => {
             overlay.classList.add('active');
         }, 10);
-    }
-    
-    // Focar no textarea
-    if (commentText) {
-        setTimeout(() => {
-            commentText.focus();
-        }, 300);
     }
 }
 
@@ -436,19 +458,113 @@ function closeCommentTab() {
     currentMemberId = null;
 }
 
+function enableEditMode() {
+    const commentDisplayContainer = document.getElementById('commentDisplayContainer');
+    const commentEditContainer = document.getElementById('commentEditContainer');
+    const commentTextArea = document.getElementById('commentTextArea');
+    const commentCounter = document.getElementById('commentCounter');
+    
+    // Esconder visualização e mostrar edição
+    if (commentDisplayContainer) {
+        commentDisplayContainer.style.display = 'none';
+    }
+    if (commentEditContainer) {
+        commentEditContainer.style.display = 'block';
+    }
+    
+    // Carregar comentário existente no textarea (se houver)
+    if (commentTextArea && currentMemberId && memberComments[currentMemberId]) {
+        commentTextArea.value = memberComments[currentMemberId];
+    } else if (commentTextArea) {
+        commentTextArea.value = '';
+    }
+    
+    // Atualizar contador
+    if (commentTextArea && commentCounter) {
+        commentCounter.textContent = commentTextArea.value.length;
+    }
+    
+    // Focar no textarea
+    if (commentTextArea) {
+        setTimeout(() => {
+            commentTextArea.focus();
+        }, 100);
+    }
+}
+
+function cancelEdit() {
+    const commentDisplayContainer = document.getElementById('commentDisplayContainer');
+    const commentEditContainer = document.getElementById('commentEditContainer');
+    
+    // Mostrar visualização e esconder edição
+    if (commentDisplayContainer) {
+        commentDisplayContainer.style.display = 'block';
+    }
+    if (commentEditContainer) {
+        commentEditContainer.style.display = 'none';
+    }
+}
+
+function deleteComment() {
+    if (!currentMemberId) return;
+    
+    // Remover comentário do storage
+    delete memberComments[currentMemberId];
+    
+    // Atualizar visual do botão para indicar que não há comentário
+    updateCommentButtonState(currentMemberId, false);
+    
+    // Atualizar a visualização do modal
+    const commentText = document.getElementById('commentText');
+    const commentContent = document.getElementById('commentContent');
+    const editBtn = document.getElementById('editBtn');
+    const addBtn = document.getElementById('addBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
+    
+    if (commentText) {
+        commentText.textContent = 'Nenhum comentário adicionado ainda.';
+    }
+    if (commentContent) {
+        commentContent.classList.add('empty');
+    }
+    if (editBtn) {
+        editBtn.style.display = 'none';
+    }
+    if (deleteBtn) {
+        deleteBtn.style.display = 'none';
+    }
+    if (addBtn) {
+        addBtn.style.display = 'inline-block';
+    }
+}
+
 function saveComment() {
     if (!currentMemberId) return;
     
-    const commentText = document.getElementById('commentText');
-    const comment = commentText ? commentText.value.trim() : '';
+    const commentTextArea = document.getElementById('commentTextArea');
+    const comment = commentTextArea ? commentTextArea.value.trim() : '';
     
     if (!comment) {
-        alert('Por favor, digite um comentário antes de salvar.');
+        // Feedback visual em vez de alert
+        commentTextArea.style.borderColor = '#dc3545';
+        commentTextArea.focus();
+        setTimeout(() => {
+            commentTextArea.style.borderColor = '#e9ecef';
+        }, 2000);
         return;
     }
     
     if (comment.length > 500) {
-        alert('O comentário deve ter no máximo 500 caracteres.');
+        // Feedback visual em vez de alert
+        const counter = document.getElementById('commentCounter');
+        if (counter) {
+            counter.style.color = '#dc3545';
+            counter.style.fontWeight = 'bold';
+            setTimeout(() => {
+                counter.style.color = '#63666A';
+                counter.style.fontWeight = 'normal';
+            }, 2000);
+        }
         return;
     }
     
@@ -458,29 +574,31 @@ function saveComment() {
     // Atualizar visual do botão para indicar que há comentário
     updateCommentButtonState(currentMemberId, true);
     
-    // Mostrar mensagem de sucesso
-    alert('Comentário salvo com sucesso!');
-    
-    // Fechar modal
-    closeCommentTab();
-}
-
-function editComment() {
-    if (!currentMemberId || !memberComments[currentMemberId]) return;
-    
+    // Atualizar a visualização do comentário
     const commentText = document.getElementById('commentText');
-    const existingComment = document.getElementById('existingComment');
+    const commentContent = document.getElementById('commentContent');
+    const editBtn = document.getElementById('editBtn');
+    const addBtn = document.getElementById('addBtn');
+    const deleteBtn = document.getElementById('deleteBtn');
     
-    // Carregar comentário existente no textarea
     if (commentText) {
-        commentText.value = memberComments[currentMemberId];
-        commentText.focus();
+        commentText.textContent = comment;
+    }
+    if (commentContent) {
+        commentContent.classList.remove('empty');
+    }
+    if (editBtn) {
+        editBtn.style.display = 'inline-block';
+    }
+    if (deleteBtn) {
+        deleteBtn.style.display = 'inline-block';
+    }
+    if (addBtn) {
+        addBtn.style.display = 'none';
     }
     
-    // Esconder seção de comentário existente
-    if (existingComment) {
-        existingComment.style.display = 'none';
-    }
+    // Voltar para modo de visualização
+    cancelEdit();
 }
 
 function updateCommentButtonState(memberId, hasComment) {
