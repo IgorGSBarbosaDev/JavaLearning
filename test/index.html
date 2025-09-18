@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipe - Membros</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Talent Development</h1>
+        </div>
+
+        <div class="team-grid" id="team-container">
+            <!-- Membro 1 -->
+            <div class="team-member">
+                <div class="photo-container">
+                    <div class="photo-placeholder" onclick="triggerFileInput(1)">
+                        👤
+                    </div>
+                    <button class="upload-btn" onclick="triggerFileInput(1)">📷</button>
+                    <input type="file" class="file-input" id="fileInput1" accept="image/*" onchange="previewImage(1, this)">
+                </div>
+                <input type="text" class="name-input" placeholder="Nome do membro" onchange="updateDisplay(1)">
+                <div class="badges-container">
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(1, 1)">
+                            <span class="placeholder-text">Selo 1</span>
+                            <span class="remove-badge" onclick="removeBadge(1, 1, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput1_1" accept="image/*" onchange="previewBadge(1, 1, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(1, 2)">
+                            <span class="placeholder-text">Selo 2</span>
+                            <span class="remove-badge" onclick="removeBadge(1, 2, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput1_2" accept="image/*" onchange="previewBadge(1, 2, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membro 2 -->
+            <div class="team-member">
+                <div class="photo-container">
+                    <div class="photo-placeholder" onclick="triggerFileInput(2)">
+                        👤
+                    </div>
+                    <button class="upload-btn" onclick="triggerFileInput(2)">📷</button>
+                    <input type="file" class="file-input" id="fileInput2" accept="image/*" onchange="previewImage(2, this)">
+                </div>
+                <input type="text" class="name-input" placeholder="Nome do membro" onchange="updateDisplay(2)">
+                <div class="badges-container">
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(2, 1)">
+                            <span class="placeholder-text">Selo 1</span>
+                            <span class="remove-badge" onclick="removeBadge(2, 1, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput2_1" accept="image/*" onchange="previewBadge(2, 1, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(2, 2)">
+                            <span class="placeholder-text">Selo 2</span>
+                            <span class="remove-badge" onclick="removeBadge(2, 2, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput2_2" accept="image/*" onchange="previewBadge(2, 2, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membro 3 -->
+            <div class="team-member">
+                <div class="photo-container">
+                    <div class="photo-placeholder" onclick="triggerFileInput(3)">
+                        👤
+                    </div>
+                    <button class="upload-btn" onclick="triggerFileInput(3)">📷</button>
+                    <input type="file" class="file-input" id="fileInput3" accept="image/*" onchange="previewImage(3, this)">
+                </div>
+                <input type="text" class="name-input" placeholder="Nome do membro" onchange="updateDisplay(3)">
+                <div class="badges-container">
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(3, 1)">
+                            <span class="placeholder-text">Selo 1</span>
+                            <span class="remove-badge" onclick="removeBadge(3, 1, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput3_1" accept="image/*" onchange="previewBadge(3, 1, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(3, 2)">
+                            <span class="placeholder-text">Selo 2</span>
+                            <span class="remove-badge" onclick="removeBadge(3, 2, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput3_2" accept="image/*" onchange="previewBadge(3, 2, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membro 4 -->
+            <div class="team-member">
+                <div class="photo-container">
+                    <div class="photo-placeholder" onclick="triggerFileInput(4)">
+                        👤
+                    </div>
+                    <button class="upload-btn" onclick="triggerFileInput(4)">📷</button>
+                    <input type="file" class="file-input" id="fileInput4" accept="image/*" onchange="previewImage(4, this)">
+                </div>
+                <input type="text" class="name-input" placeholder="Nome do membro" onchange="updateDisplay(4)">
+                <div class="badges-container">
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(4, 1)">
+                            <span class="placeholder-text">Selo 1</span>
+                            <span class="remove-badge" onclick="removeBadge(4, 1, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput4_1" accept="image/*" onchange="previewBadge(4, 1, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(4, 2)">
+                            <span class="placeholder-text">Selo 2</span>
+                            <span class="remove-badge" onclick="removeBadge(4, 2, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput4_2" accept="image/*" onchange="previewBadge(4, 2, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membro 5 -->
+            <div class="team-member">
+                <div class="photo-container">
+                    <div class="photo-placeholder" onclick="triggerFileInput(5)">
+                        👤
+                    </div>
+                    <button class="upload-btn" onclick="triggerFileInput(5)">📷</button>
+                    <input type="file" class="file-input" id="fileInput5" accept="image/*" onchange="previewImage(5, this)">
+                </div>
+                <input type="text" class="name-input" placeholder="Nome do membro" onchange="updateDisplay(5)">
+                <div class="badges-container">
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(5, 1)">
+                            <span class="placeholder-text">Selo 1</span>
+                            <span class="remove-badge" onclick="removeBadge(5, 1, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput5_1" accept="image/*" onchange="previewBadge(5, 1, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(5, 2)">
+                            <span class="placeholder-text">Selo 2</span>
+                            <span class="remove-badge" onclick="removeBadge(5, 2, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput5_2" accept="image/*" onchange="previewBadge(5, 2, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Membro 6 -->
+            <div class="team-member">
+                <div class="photo-container">
+                    <div class="photo-placeholder" onclick="triggerFileInput(6)">
+                        👤
+                    </div>
+                    <button class="upload-btn" onclick="triggerFileInput(6)">📷</button>
+                    <input type="file" class="file-input" id="fileInput6" accept="image/*" onchange="previewImage(6, this)">
+                </div>
+                <input type="text" class="name-input" placeholder="Nome do membro" onchange="updateDisplay(6)">
+                <div class="badges-container">
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(6, 1)">
+                            <span class="placeholder-text">Selo 1</span>
+                            <span class="remove-badge" onclick="removeBadge(6, 1, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput6_1" accept="image/*" onchange="previewBadge(6, 1, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                    <div class="badge-wrapper">
+                        <div class="badge-slot" onclick="triggerBadgeInput(6, 2)">
+                            <span class="placeholder-text">Selo 2</span>
+                            <span class="remove-badge" onclick="removeBadge(6, 2, event)">✕</span>
+                            <input type="file" class="badge-file-input" id="badgeInput6_2" accept="image/*" onchange="previewBadge(6, 2, this)">
+                        </div>
+                        <div class="badge-name"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Painel de seleção de selos -->
+    <div class="seal-selector-overlay" id="sealSelectorOverlay">
+        <div class="seal-selector-panel">
+            <div class="seal-selector-header">
+                <h2>🏆 Selecionar Selo</h2>
+                <p>Escolha um selo de avaliação para o membro</p>
+            </div>
+            
+            <div class="seal-options-grid" id="sealOptionsGrid">
+                
+            </div>
+            
+            <div class="seal-selector-actions">
+                <button class="seal-action-btn cancel" onclick="closeSealSelector()">Cancelar</button>
+                <button class="seal-action-btn remove" onclick="removeCurrentSeal()">🗑️ Remover Selo</button>
+                <button class="seal-action-btn upload" onclick="triggerCustomUpload()">📁 Escolher Arquivo</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="customSealInput" accept="image/*" style="display: none;" onchange="handleCustomSealUpload(this)">
+
+    <script src="script.js"></script>
+</body>
+</html>
