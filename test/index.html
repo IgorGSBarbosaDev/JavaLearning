@@ -41,6 +41,7 @@
                         <div class="badge-name"></div>
                     </div>
                 </div>
+                <button class="comment-btn" onclick="openCommentTab(1)">💬 Adicionar Comentário</button>
             </div>
 
             <!-- Membro 2 -->
@@ -71,6 +72,7 @@
                         <div class="badge-name"></div>
                     </div>
                 </div>
+                <button class="comment-btn" onclick="openCommentTab(2)">💬 Adicionar Comentário</button>
             </div>
 
             <!-- Membro 3 -->
@@ -101,6 +103,7 @@
                         <div class="badge-name"></div>
                     </div>
                 </div>
+                <button class="comment-btn" onclick="openCommentTab(3)">💬 Adicionar Comentário</button>
             </div>
 
             <!-- Membro 4 -->
@@ -131,6 +134,7 @@
                         <div class="badge-name"></div>
                     </div>
                 </div>
+                <button class="comment-btn" onclick="openCommentTab(4)">💬 Adicionar Comentário</button>
             </div>
 
             <!-- Membro 5 -->
@@ -161,6 +165,7 @@
                         <div class="badge-name"></div>
                     </div>
                 </div>
+                <button class="comment-btn" onclick="openCommentTab(5)">💬 Adicionar Comentário</button>
             </div>
 
             <!-- Membro 6 -->
@@ -191,6 +196,7 @@
                         <div class="badge-name"></div>
                     </div>
                 </div>
+                <button class="comment-btn" onclick="openCommentTab(6)">💬 Adicionar Comentário</button>
             </div>
         </div>
     </div>
@@ -216,6 +222,42 @@
     </div>
 
     <input type="file" id="customSealInput" accept="image/*" style="display: none;" onchange="handleCustomSealUpload(this)">
+
+    <!-- Modal de Comentários -->
+    <div class="comment-modal-overlay" id="commentModalOverlay">
+        <div class="comment-modal">
+            <div class="comment-modal-header">
+                <h2>💬 Comentários</h2>
+                <span class="member-name" id="commentMemberName">Nome do Membro</span>
+                <button class="close-btn" onclick="closeCommentTab()">✕</button>
+            </div>
+            
+            <div class="comment-modal-body">
+                <div class="comment-form">
+                    <textarea 
+                        id="commentText" 
+                        placeholder="Digite seu comentário sobre este membro da equipe..."
+                        rows="6"
+                        maxlength="500"
+                    ></textarea>
+                    <div class="comment-counter">
+                        <span id="commentCounter">0</span>/500 caracteres
+                    </div>
+                </div>
+                
+                <div class="comment-actions">
+                    <button class="comment-action-btn cancel" onclick="closeCommentTab()">Cancelar</button>
+                    <button class="comment-action-btn save" onclick="saveComment()">Salvar Comentário</button>
+                </div>
+                
+                <div class="existing-comment" id="existingComment" style="display: none;">
+                    <h3>Comentário Atual:</h3>
+                    <div class="comment-display" id="commentDisplay"></div>
+                    <button class="edit-comment-btn" onclick="editComment()">✏️ Editar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

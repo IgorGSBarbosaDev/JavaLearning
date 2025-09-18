@@ -337,4 +337,174 @@ window.addEventListener('load', function() {
             closeSealSelector();
         }
     });
+
+    // Adicionar evento para fechar modal de comentários ao clicar fora
+    const commentOverlay = document.getElementById('commentModalOverlay');
+    if (commentOverlay) {
+        commentOverlay.addEventListener('click', function(e) {
+            if (e.target === commentOverlay) {
+                closeCommentTab();
+            }
+        });
+    }
+
+    // Configurar contador de caracteres
+    const commentText = document.getElementById('commentText');
+    const commentCounter = document.getElementById('commentCounter');
+    if (commentText && commentCounter) {
+        commentText.addEventListener('input', function() {
+            const length = this.value.length;
+            commentCounter.textContent = length;
+            
+            if (length > 450) {
+                commentCounter.style.color = '#dc3545';
+            } else if (length > 400) {
+                commentCounter.style.color = '#fd7e14';
+            } else {
+                commentCounter.style.color = '#63666A';
+            }
+        });
+    }
 });
+
+// ===== SISTEMA DE COMENTÁRIOS =====
+const memberComments = {}; // Armazena comentários por membro
+
+function openCommentTab(memberId) {
+    currentMemberId = memberId;
+    const overlay = document.getElementById('commentModalOverlay');
+    const memberNameElement = document.getElementById('commentMemberName');
+    const commentText = document.getElementById('commentText');
+    const existingComment = document.getElementById('existingComment');
+    const commentDisplay = document.getElementById('commentDisplay');
+    
+    // Obter o nome do membro do input
+    const nameInput = document.querySelector(`.team-member:nth-child(${memberId}) .name-input`);
+    const memberName = nameInput && nameInput.value ? nameInput.value : `Membro ${memberId}`;
+    
+    // Atualizar o nome no modal
+    if (memberNameElement) {
+        memberNameElement.textContent = memberName;
+    }
+    
+    // Verificar se já existe comentário para este membro
+    if (memberComments[memberId]) {
+        // Mostrar comentário existente
+        if (existingComment && commentDisplay) {
+            commentDisplay.textContent = memberComments[memberId];
+            existingComment.style.display = 'block';
+        }
+        // Limpar textarea para não confundir
+        if (commentText) {
+            commentText.value = '';
+        }
+    } else {
+        // Esconder seção de comentário existente
+        if (existingComment) {
+            existingComment.style.display = 'none';
+        }
+        // Limpar textarea
+        if (commentText) {
+            commentText.value = '';
+        }
+    }
+    
+    // Mostrar modal
+    if (overlay) {
+        overlay.style.display = 'flex';
+        setTimeout(() => {
+            overlay.classList.add('active');
+        }, 10);
+    }
+    
+    // Focar no textarea
+    if (commentText) {
+        setTimeout(() => {
+            commentText.focus();
+        }, 300);
+    }
+}
+
+function closeCommentTab() {
+    const overlay = document.getElementById('commentModalOverlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        setTimeout(() => {
+            overlay.style.display = 'none';
+        }, 300);
+    }
+    currentMemberId = null;
+}
+
+function saveComment() {
+    if (!currentMemberId) return;
+    
+    const commentText = document.getElementById('commentText');
+    const comment = commentText ? commentText.value.trim() : '';
+    
+    if (!comment) {
+        alert('Por favor, digite um comentário antes de salvar.');
+        return;
+    }
+    
+    if (comment.length > 500) {
+        alert('O comentário deve ter no máximo 500 caracteres.');
+        return;
+    }
+    
+    // Salvar comentário
+    memberComments[currentMemberId] = comment;
+    
+    // Atualizar visual do botão para indicar que há comentário
+    updateCommentButtonState(currentMemberId, true);
+    
+    // Mostrar mensagem de sucesso
+    alert('Comentário salvo com sucesso!');
+    
+    // Fechar modal
+    closeCommentTab();
+}
+
+function editComment() {
+    if (!currentMemberId || !memberComments[currentMemberId]) return;
+    
+    const commentText = document.getElementById('commentText');
+    const existingComment = document.getElementById('existingComment');
+    
+    // Carregar comentário existente no textarea
+    if (commentText) {
+        commentText.value = memberComments[currentMemberId];
+        commentText.focus();
+    }
+    
+    // Esconder seção de comentário existente
+    if (existingComment) {
+        existingComment.style.display = 'none';
+    }
+}
+
+function updateCommentButtonState(memberId, hasComment) {
+    const commentBtn = document.querySelector(`.team-member:nth-child(${memberId}) .comment-btn`);
+    if (commentBtn) {
+        if (hasComment) {
+            commentBtn.innerHTML = '💬 Ver/Editar Comentário';
+            commentBtn.style.background = 'linear-gradient(135deg, #17a2b8 0%, #138496 100%)';
+        } else {
+            commentBtn.innerHTML = '💬 Adicionar Comentário';
+            commentBtn.style.background = 'linear-gradient(135deg, #84BD00 0%, #257226 100%)';
+        }
+    }
+}
+
+// Função para exportar comentários (opcional)
+function exportComments() {
+    const comments = {};
+    for (let memberId in memberComments) {
+        const nameInput = document.querySelector(`.team-member:nth-child(${memberId}) .name-input`);
+        const memberName = nameInput && nameInput.value ? nameInput.value : `Membro ${memberId}`;
+        comments[memberName] = memberComments[memberId];
+    }
+    
+    console.log('Comentários salvos:', comments);
+    return comments;
+}
