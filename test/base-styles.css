@@ -1,0 +1,178 @@
+/* =========================================
+   BASE STYLES - Configurações Fundamentais
+   ========================================= */
+
+/* ===== RESET E CONFIGURAÇÕES GLOBAIS ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #84BD00 0%, #257226 50%, #63666A 100%);
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+/* ===== CONTAINER E LAYOUT PRINCIPAL ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.header h1 {
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.header p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.2rem;
+}
+
+/* ===== GRID DA EQUIPE ===== */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.team-member {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.team-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+/* ===== CONTAINER DA FOTO ===== */
+.photo-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+}
+
+.member-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #84BD00;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.member-photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(132, 189, 0, 0.4);
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #84BD00, #257226);
+    border: 4px solid #84BD00;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.photo-placeholder:hover {
+    background: linear-gradient(45deg, #257226, #63666A);
+    transform: scale(1.05);
+}
+
+/* ===== NOME DO MEMBRO ===== */
+.member-name {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #257226;
+    margin-bottom: 8px;
+    text-transform: capitalize;
+}
+
+.name-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    text-align: center;
+    transition: border-color 0.3s ease;
+    margin-bottom: 10px;
+    background: rgba(255,255,255,0.8);
+}
+
+.name-input:focus {
+    outline: none;
+    border-color: #84BD00;
+    background: white;
+}
+
+/* ===== BOTÕES DE UPLOAD ===== */
+.upload-btn {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 35px;
+    height: 35px;
+    background: #84BD00;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.upload-btn:hover {
+    background: #257226;
+    transform: scale(1.1);
+}
+
+.file-input {
+    display: none;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .team-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .photo-container {
+        width: 120px;
+        height: 120px;
+    }
+}
