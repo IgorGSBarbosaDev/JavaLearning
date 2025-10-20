@@ -1085,10 +1085,4 @@ Depois de completar o projeto básico e usar no dia a dia, você pode adicionar:
 
 ---
 
-## 📄 Licença
-
-MIT License - use como quiser para aprender! 🚀
-
----
-
 **Próximo projeto recomendado:** [E-commerce](../04-Intermediate-Ecommerce/) ou [Blog Platform](../05-Intermediate-Blog/)
