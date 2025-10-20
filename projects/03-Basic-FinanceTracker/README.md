@@ -1,8 +1,8 @@
-# 💰 Personal Finance Tracker - Controle Financeiro Pessoal
+# 💰 Virtual Wallet - Carteira Digital Inteligente
 
 > **Nível:** 🟢 Basic | **Duração:** 2-3 semanas | **Complexidade:** ⭐⭐⭐
 
-Sistema de controle financeiro pessoal construído com **Java Spring Boot** para gerenciar receitas, despesas e visualizar gastos através de relatórios simples. Projeto focado em aprender os fundamentos de uma aplicação web completa.
+Carteira digital construída com **Java Spring Boot** para controlar suas finanças pessoais do dia a dia. Gerencie receitas, despesas, acompanhe seu histórico completo e visualize para onde seu dinheiro está indo através de gráficos e relatórios práticos. Projeto focado em ser **realmente útil** no cotidiano enquanto você aprende Spring Boot.
 
 ---
 
@@ -25,13 +25,31 @@ Sistema de controle financeiro pessoal construído com **Java Spring Boot** para
 
 ## 🎯 Por que este projeto?
 
-✅ **Primeiro contato com Spring Boot**: Entenda como criar APIs REST  
-✅ **CRUD Completo**: Criar, Ler, Atualizar e Deletar dados  
-✅ **Banco de Dados**: Trabalhar com JPA/Hibernate e PostgreSQL  
-✅ **Autenticação**: Implementar login simples com JWT  
-✅ **Frontend Integrado**: Conectar React com backend Java  
-✅ **Deploy**: Colocar sua aplicação no ar (Heroku/Railway)  
-✅ **Boas Práticas**: Código organizado em camadas (Controller → Service → Repository)
+Este não é apenas um projeto de estudo - é uma **ferramenta real** para usar no seu dia a dia!
+
+✅ **Controle Real das Finanças**: Saiba exatamente para onde seu dinheiro está indo  
+✅ **Histórico Completo**: Todas as transações armazenadas e pesquisáveis  
+✅ **Categorização Inteligente**: Veja quanto gasta em cada área (alimentação, transporte, etc)  
+✅ **Saldo Atual**: Sempre saiba quanto tem disponível  
+✅ **Análise Mensal**: Compare seus gastos mês a mês  
+✅ **Aprenda Spring Boot**: Construa algo útil enquanto estuda  
+✅ **Boas Práticas**: Código organizado, seguro e profissional
+
+### 💡 Cenário Real de Uso
+
+**Dia 1 - Configuração Inicial:**
+- Cadastrar suas categorias (Alimentação, Transporte, Lazer, Casa, etc)
+- Registrar seu saldo inicial
+
+**Dia a Dia:**
+- Toda vez que gastar ou receber dinheiro → registrar na carteira
+- Ver saldo atualizado em tempo real
+- Acompanhar quanto já gastou no mês
+
+**Fim do Mês:**
+- Ver relatório: quanto gastou em cada categoria
+- Comparar com mês anterior
+- Identificar onde pode economizar
 
 ---
 
@@ -206,7 +224,7 @@ Sistema monolítico com arquitetura em 3 camadas:
 
 ## 📋 Funcionalidades
 
-### 1. Autenticação de Usuários
+### 🔐 1. Sistema de Usuário
 
 ```java
 @RestController
@@ -215,23 +233,60 @@ public class AuthController {
     
     @PostMapping("/register")
     public ResponseEntity<UserDTO> register(@Valid @RequestBody RegisterDTO dto) {
-        // Registra novo usuário
+        // Cadastro com email único + senha segura
     }
     
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginDTO dto) {
-        // Retorna JWT token
+        // Login retorna JWT + dados do usuário
     }
 }
 ```
 
 **Features:**
-- ✅ Registro com email único
-- ✅ Login com JWT (válido 24h)
-- ✅ Senha com BCrypt
-- ✅ Logout (frontend limpa token)
+- ✅ Cada usuário tem sua própria carteira isolada
+- ✅ Login seguro com JWT
+- ✅ Senha criptografada (BCrypt)
+- ✅ Perfil do usuário editável
 
-### 2. Gestão de Categorias
+---
+
+### 💰 2. Saldo e Carteira
+
+```java
+@RestController
+@RequestMapping("/api/wallet")
+public class WalletController {
+    
+    @GetMapping("/balance")
+    public ResponseEntity<BalanceDTO> getCurrentBalance() {
+        // Saldo atual = soma de todas receitas - despesas
+    }
+    
+    @PostMapping("/initial-balance")
+    public ResponseEntity<Void> setInitialBalance(@RequestBody BigDecimal amount) {
+        // Define saldo inicial ao começar a usar
+    }
+    
+    @GetMapping("/balance-history")
+    public ResponseEntity<List<BalanceHistoryDTO>> getBalanceHistory(
+        @RequestParam LocalDate startDate,
+        @RequestParam LocalDate endDate
+    ) {
+        // Evolução do saldo ao longo do tempo
+    }
+}
+```
+
+**Features:**
+- ✅ **Saldo em tempo real**: Sempre atualizado após cada transação
+- ✅ **Saldo inicial configurável**: Começa com o valor que você tem hoje
+- ✅ **Histórico de saldo**: Veja como seu dinheiro evoluiu
+- ✅ **Validações**: Não permite saldo negativo (opcional)
+
+---
+
+### 🏷️ 3. Categorias Personalizadas
 
 ```java
 @RestController
@@ -239,31 +294,61 @@ public class AuthController {
 public class CategoryController {
     
     @GetMapping
-    public List<CategoryDTO> getUserCategories() { }
+    public List<CategoryDTO> getMyCategories() {
+        // Lista todas as categorias do usuário
+    }
     
     @PostMapping
-    public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO dto) { }
+    public ResponseEntity<CategoryDTO> create(@Valid @RequestBody CategoryDTO dto) {
+        // Criar categoria customizada
+    }
     
-    @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> update(@PathVariable Long id, @Valid @RequestBody CategoryDTO dto) { }
-    
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) { }
+    @GetMapping("/default")
+    public List<CategoryDTO> getDefaultCategories() {
+        // Categorias sugeridas para começar
+    }
 }
 ```
 
-**Features:**
-- ✅ CRUD completo
-- ✅ Tipos: RECEITA ou DESPESA
-- ✅ Personalização: nome, cor, ícone
-- ✅ Categorias padrão no registro
+**Categorias Padrão Sugeridas:**
 
-### 3. Gestão de Transações
+**DESPESAS:**
+- 🍔 Alimentação (restaurantes, mercado, delivery)
+- 🚗 Transporte (combustível, uber, ônibus, manutenção)
+- 🏠 Casa (aluguel, contas, internet, luz, água)
+- 🎮 Lazer (cinema, jogos, streaming, hobbies)
+- 👕 Vestuário (roupas, sapatos, acessórios)
+- 💊 Saúde (farmácia, consultas, academia)
+- 📚 Educação (cursos, livros, material)
+- 💳 Outros
+
+**RECEITAS:**
+- 💼 Salário
+- 💰 Freelance
+- 🎁 Presente/Bonificação
+- 📈 Investimentos
+- 💵 Outros
+
+**Features:**
+- ✅ Criar categorias ilimitadas
+- ✅ Personalizar: nome, cor, ícone
+- ✅ Ativar/desativar categorias
+- ✅ Ver total gasto por categoria
+
+---
+
+### 📝 4. Gestão de Transações
 
 ```java
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
+    
+    @PostMapping
+    public ResponseEntity<TransactionDTO> create(@Valid @RequestBody TransactionDTO dto) {
+        // Adicionar receita ou despesa
+        // Atualiza saldo automaticamente
+    }
     
     @GetMapping
     public Page<TransactionDTO> getAll(
@@ -271,56 +356,186 @@ public class TransactionController {
         @RequestParam(required = false) LocalDate endDate,
         @RequestParam(required = false) Long categoryId,
         @RequestParam(required = false) TransactionType type,
+        @RequestParam(required = false) String search,
         Pageable pageable
-    ) { }
+    ) {
+        // Lista com filtros poderosos
+    }
     
-    @PostMapping
-    public ResponseEntity<TransactionDTO> create(@Valid @RequestBody TransactionDTO dto) { }
+    @GetMapping("/recent")
+    public List<TransactionDTO> getRecent(@RequestParam(defaultValue = "10") int limit) {
+        // Últimas transações (útil no dashboard)
+    }
     
     @PutMapping("/{id}")
-    public ResponseEntity<TransactionDTO> update(@PathVariable Long id, @Valid @RequestBody TransactionDTO dto) { }
+    public ResponseEntity<TransactionDTO> update(@PathVariable Long id, @Valid @RequestBody TransactionDTO dto) {
+        // Editar transação (recalcula saldo)
+    }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) { }
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        // Deletar transação (recalcula saldo)
+    }
 }
 ```
 
 **Features:**
-- ✅ CRUD completo
-- ✅ Filtros: período, categoria, tipo
-- ✅ Paginação (10 itens/página)
-- ✅ Ordenação por data
-- ✅ Validações: valor > 0, data não futura
+- ✅ **Adicionar rápido**: Descrição, valor, categoria, data
+- ✅ **Histórico completo**: Todas as transações salvas
+- ✅ **Busca avançada**: Por descrição, categoria, período, tipo
+- ✅ **Editar/Deletar**: Corrigir erros facilmente
+- ✅ **Paginação**: Carrega rápido mesmo com muitos dados
+- ✅ **Anexar nota**: Campo opcional para observações
 
-### 4. Relatórios e Dashboard
+---
+
+### 📊 5. Relatórios e Análises
 
 ```java
 @RestController
 @RequestMapping("/api/reports")
 public class ReportController {
     
-    @GetMapping("/summary")
-    public DashboardSummaryDTO getSummary(
-        @RequestParam(required = false) LocalDate startDate,
-        @RequestParam(required = false) LocalDate endDate
-    ) {
-        // Total receitas, despesas, saldo
-        // Dados para gráficos
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardDTO> getDashboard() {
+        // Dashboard principal com resumo do mês atual
+        return {
+            currentBalance: 2450.00,
+            monthIncome: 5000.00,
+            monthExpense: 2550.00,
+            mostExpensiveCategory: "Alimentação (R$ 800)",
+            transactionCount: 45,
+            averageExpense: 56.67
+        };
     }
     
     @GetMapping("/monthly/{year}/{month}")
-    public MonthlyReportDTO getMonthlyReport(@PathVariable int year, @PathVariable int month) {
-        // Relatório detalhado do mês
+    public ResponseEntity<MonthlyReportDTO> getMonthlyReport(
+        @PathVariable int year, 
+        @PathVariable int month
+    ) {
+        // Relatório completo do mês
+        return {
+            totalIncome: 5000.00,
+            totalExpense: 2550.00,
+            balance: 2450.00,
+            expenseByCategory: [
+                { category: "Alimentação", amount: 800.00, percentage: 31% },
+                { category: "Transporte", amount: 450.00, percentage: 18% },
+                { category: "Casa", amount: 800.00, percentage: 31% },
+                { category: "Lazer", amount: 300.00, percentage: 12% },
+                { category: "Outros", amount: 200.00, percentage: 8% }
+            ],
+            topExpenses: [...],
+            comparisonWithLastMonth: { ... }
+        };
+    }
+    
+    @GetMapping("/yearly/{year}")
+    public ResponseEntity<YearlyReportDTO> getYearlyReport(@PathVariable int year) {
+        // Visão anual: evolução mês a mês
+    }
+    
+    @GetMapping("/category/{categoryId}/history")
+    public ResponseEntity<CategoryHistoryDTO> getCategoryHistory(
+        @PathVariable Long categoryId,
+        @RequestParam int months // últimos N meses
+    ) {
+        // Quanto gastou nessa categoria nos últimos meses
+    }
+    
+    @GetMapping("/export")
+    public ResponseEntity<byte[]> exportToCSV(
+        @RequestParam LocalDate startDate,
+        @RequestParam LocalDate endDate
+    ) {
+        // Exportar transações para Excel/CSV
     }
 }
 ```
 
+**Features Dashboard:**
+- ✅ **Saldo atual** em destaque
+- ✅ **Resumo do mês**: Total receitas vs despesas
+- ✅ **Gráfico de pizza**: Distribuição por categoria (%)
+- ✅ **Gráfico de linha**: Evolução do saldo nos últimos 6 meses
+- ✅ **Top 5 maiores gastos** do mês
+- ✅ **Comparação**: Este mês vs mês anterior
+- ✅ **Média diária** de gastos
+- ✅ **Dias até acabar o dinheiro** (previsão baseada no padrão)
+
+**Features Relatórios:**
+- ✅ **Mensal**: Detalhamento completo do mês
+- ✅ **Anual**: Visão de 12 meses
+- ✅ **Por categoria**: Acompanhar tendências
+- ✅ **Exportar**: Baixar dados em CSV/Excel
+- ✅ **Filtros personalizados**: Qualquer período
+
+---
+
+### 🔍 6. Pesquisa e Filtros
+
+```java
+@GetMapping("/transactions/search")
+public Page<TransactionDTO> search(
+    @RequestParam String query,              // Busca na descrição
+    @RequestParam(required = false) LocalDate startDate,
+    @RequestParam(required = false) LocalDate endDate,
+    @RequestParam(required = false) Long categoryId,
+    @RequestParam(required = false) TransactionType type,
+    @RequestParam(required = false) BigDecimal minAmount,
+    @RequestParam(required = false) BigDecimal maxAmount,
+    Pageable pageable
+) {
+    // Exemplo: "Encontre todos os gastos com 'uber' entre R$20 e R$50 em Março"
+}
+```
+
 **Features:**
-- ✅ Resumo: receitas, despesas, saldo
-- ✅ Gráfico pizza: gastos por categoria
-- ✅ Gráfico linha: evolução mensal
-- ✅ Filtro por período
-- ✅ Top 5 maiores gastos
+- ✅ Buscar por descrição (ex: "uber", "ifood")
+- ✅ Filtrar por período customizado
+- ✅ Filtrar por categoria
+- ✅ Filtrar por tipo (receita ou despesa)
+- ✅ Filtrar por faixa de valor
+- ✅ Combinar múltiplos filtros
+
+---
+
+### 📱 7. Funcionalidades Extras Úteis
+
+```java
+// Metas de gastos
+@PostMapping("/api/goals")
+public ResponseEntity<GoalDTO> createGoal(@Valid @RequestBody GoalDTO dto) {
+    // Ex: "Gastar no máximo R$ 500 em Alimentação este mês"
+}
+
+@GetMapping("/api/goals/status")
+public List<GoalStatusDTO> getGoalsStatus() {
+    // Mostra quanto falta/ultrapassou de cada meta
+}
+
+// Transações recorrentes (sugestão)
+@GetMapping("/api/transactions/recurring-suggestion")
+public List<RecurringSuggestionDTO> getRecurringSuggestions() {
+    // Detecta padrões: "Você gasta R$ 800 todo dia 10 em 'Aluguel'"
+}
+
+// Insights automáticos
+@GetMapping("/api/insights")
+public List<InsightDTO> getInsights() {
+    // "Você gastou 25% a mais em Alimentação este mês"
+    // "Seu maior gasto foi R$ 150 em 'Restaurante X'"
+    // "Você economizou R$ 200 comparado ao mês passado"
+}
+```
+
+**Features Extras:**
+- ✅ **Metas por categoria**: Alerta quando ultrapassar
+- ✅ **Insights automáticos**: Sistema avisa sobre padrões
+- ✅ **Sugestão de recorrentes**: Detecta gastos fixos
+- ✅ **Notificações**: Avisos quando próximo do limite
+- ✅ **Tags personalizadas**: Adicionar etiquetas às transações
 
 ---
 
@@ -393,7 +608,7 @@ finance-tracker/
 
 ## 🗄️ Banco de Dados
 
-### Modelagem
+### Modelagem Completa
 
 ```java
 @Entity
@@ -410,6 +625,11 @@ public class User {
     private String password; // BCrypt
     
     private String name;
+    
+    private BigDecimal initialBalance; // Saldo inicial configurado
+    
+    @CreationTimestamp
+    private LocalDateTime createdAt;
     
     @OneToMany(mappedBy = "user")
     private List<Category> categories;
@@ -431,34 +651,75 @@ public class Category {
     private CategoryType type; // INCOME, EXPENSE
     
     private String color; // "#FF5733"
-    private String icon;
+    private String icon; // "shopping-cart"
+    
+    private Boolean active = true; // Pode desativar sem deletar
     
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+    
+    @OneToMany(mappedBy = "category")
+    private List<Transaction> transactions;
 }
 
 @Entity
 @Table(name = "transactions")
+@EntityListeners(AuditingEntityListener.class)
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     private String description;
+    
+    @Column(nullable = false)
     private BigDecimal amount;
+    
+    @Column(nullable = false)
     private LocalDate date;
     
     @Enumerated(EnumType.STRING)
     private TransactionType type; // INCOME, EXPENSE
     
+    private String notes; // Observações opcionais
+    
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    
+    @CreatedDate
+    private LocalDateTime createdAt;
+    
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
+}
+
+@Entity
+@Table(name = "spending_goals")
+public class SpendingGoal {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+    
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+    
+    private BigDecimal targetAmount; // Meta: ex: R$ 500
+    
+    private Integer month; // 1-12
+    private Integer year;
+    
+    private Boolean active = true;
 }
 ```
 
@@ -468,22 +729,95 @@ public class Transaction {
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
     
+    // Buscar com filtros
     @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId " +
            "AND (:startDate IS NULL OR t.date >= :startDate) " +
-           "AND (:endDate IS NULL OR t.date <= :endDate)")
+           "AND (:endDate IS NULL OR t.date <= :endDate) " +
+           "AND (:categoryId IS NULL OR t.category.id = :categoryId) " +
+           "AND (:type IS NULL OR t.type = :type) " +
+           "AND (:search IS NULL OR LOWER(t.description) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<Transaction> findWithFilters(
         @Param("userId") Long userId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate,
+        @Param("categoryId") Long categoryId,
+        @Param("type") TransactionType type,
+        @Param("search") String search,
         Pageable pageable
     );
     
+    // Calcular saldo atual
+    @Query("SELECT COALESCE(SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE -t.amount END), 0) " +
+           "FROM Transaction t WHERE t.user.id = :userId")
+    BigDecimal calculateCurrentBalance(@Param("userId") Long userId);
+    
+    // Total de receitas do período
     @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
            "WHERE t.user.id = :userId AND t.type = 'INCOME' " +
            "AND t.date BETWEEN :startDate AND :endDate")
     BigDecimal getTotalIncome(@Param("userId") Long userId,
                              @Param("startDate") LocalDate startDate,
                              @Param("endDate") LocalDate endDate);
+    
+    // Total de despesas do período
+    @Query("SELECT COALESCE(SUM(t.amount), 0) FROM Transaction t " +
+           "WHERE t.user.id = :userId AND t.type = 'EXPENSE' " +
+           "AND t.date BETWEEN :startDate AND :endDate")
+    BigDecimal getTotalExpense(@Param("userId") Long userId,
+                              @Param("startDate") LocalDate startDate,
+                              @Param("endDate") LocalDate endDate);
+    
+    // Gastos por categoria no período
+    @Query("SELECT t.category.name as categoryName, SUM(t.amount) as total " +
+           "FROM Transaction t " +
+           "WHERE t.user.id = :userId AND t.type = 'EXPENSE' " +
+           "AND t.date BETWEEN :startDate AND :endDate " +
+           "GROUP BY t.category.id, t.category.name " +
+           "ORDER BY total DESC")
+    List<CategoryExpenseProjection> getExpensesByCategory(
+        @Param("userId") Long userId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate
+    );
+    
+    // Top N maiores gastos
+    @Query("SELECT t FROM Transaction t " +
+           "WHERE t.user.id = :userId AND t.type = 'EXPENSE' " +
+           "AND t.date BETWEEN :startDate AND :endDate " +
+           "ORDER BY t.amount DESC")
+    List<Transaction> findTopExpenses(
+        @Param("userId") Long userId,
+        @Param("startDate") LocalDate startDate,
+        @Param("endDate") LocalDate endDate,
+        Pageable pageable
+    );
+    
+    // Últimas N transações
+    @Query("SELECT t FROM Transaction t WHERE t.user.id = :userId ORDER BY t.date DESC, t.createdAt DESC")
+    List<Transaction> findRecentTransactions(@Param("userId") Long userId, Pageable pageable);
+    
+    // Evolução do saldo (por mês)
+    @Query("SELECT FUNCTION('MONTH', t.date) as month, " +
+           "FUNCTION('YEAR', t.date) as year, " +
+           "SUM(CASE WHEN t.type = 'INCOME' THEN t.amount ELSE -t.amount END) as balance " +
+           "FROM Transaction t " +
+           "WHERE t.user.id = :userId " +
+           "GROUP BY FUNCTION('YEAR', t.date), FUNCTION('MONTH', t.date) " +
+           "ORDER BY year DESC, month DESC")
+    List<MonthlyBalanceProjection> getMonthlyBalanceHistory(@Param("userId") Long userId);
+}
+
+// Projection para gastos por categoria
+public interface CategoryExpenseProjection {
+    String getCategoryName();
+    BigDecimal getTotal();
+}
+
+// Projection para histórico mensal
+public interface MonthlyBalanceProjection {
+    Integer getMonth();
+    Integer getYear();
+    BigDecimal getBalance();
 }
 ```
 
@@ -696,24 +1030,42 @@ curl http://localhost:8080/api/reports/summary \
 
 ## 🎯 Melhorias Futuras
 
-Depois de completar o projeto básico, você pode adicionar:
+Depois de completar o projeto básico e usar no dia a dia, você pode adicionar:
 
-### Features Intermediárias
-- 📊 Export de relatórios em PDF/CSV
-- 🔔 Sistema de notificações
-- 📅 Transações recorrentes
-- 💳 Gestão de múltiplas contas
-- 🎯 Metas de economia
-- 📱 PWA (app instalável)
-- 🌙 Dark mode
+### Features Práticas (Fácil)
+- 📊 **Export Excel/CSV**: Baixar todas as transações
+- 🔔 **Notificações por Email**: Avisar quando atingir meta
+- 📅 **Transações recorrentes**: Marcar gastos fixos (aluguel, assinatura)
+- 💳 **Múltiplas contas**: Carteira, banco, investimentos separados
+- 📱 **PWA**: Instalar como app no celular
+- 🌙 **Dark mode**: Tema escuro
+- 📸 **Upload de recibo**: Anexar foto do comprovante
 
-### Features Avançadas
-- 🤖 Categorização automática com AI
-- 🏦 Integração com Open Banking
-- 📈 Gráficos mais complexos (D3.js)
-- 🔐 Two-Factor Authentication
-- 🌍 Multi-idioma (i18n)
-- 📊 Dashboard analytics avançado
+### Features Intermediárias (Médio)
+- 🎯 **Metas avançadas**: "Economizar R$ 1000 até Dezembro"
+- � **Gráficos avançados**: Comparações, tendências, previsões
+- 🤝 **Compartilhar carteira**: Gerenciar finanças em casal/família
+- 🏦 **Conta compartilhada**: Rachar despesas
+- 💰 **Controle de dívidas**: Gerenciar empréstimos e parcelamentos
+- 📈 **Investimentos**: Acompanhar rentabilidade
+- 🔄 **Sincronização**: Backup automático na nuvem
+
+### Features Avançadas (Difícil)
+- 🤖 **IA para categorização**: Sugerir categoria automaticamente
+- 🏦 **Open Banking**: Importar transações do banco automaticamente
+- 📊 **Análise preditiva**: "Você vai gastar R$ X este mês"
+- � **Insights inteligentes**: "Você pode economizar R$ Y cortando Z"
+- 🌍 **Multi-moeda**: Viagens internacionais
+- 📱 **App mobile nativo**: React Native ou Flutter
+- 🔐 **Biometria**: Login com digital/face
+
+### Melhorias de UX
+- ⚡ **Adicionar transação rápido**: Modal sempre disponível
+- � **Personalização**: Escolher tema, cores, layout
+- 📊 **Widgets customizáveis**: Montar seu dashboard
+- 🔍 **Busca avançada**: Filtros salvos
+- ⌨️ **Atalhos de teclado**: Agilizar navegação
+- 📱 **Responsividade total**: Perfeito em qualquer tela
 
 ---
 

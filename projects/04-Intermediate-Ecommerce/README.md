@@ -22,8 +22,8 @@ Loja virtual completa com catálogo de produtos, carrinho, pagamentos, painel ad
 ├─────────────────────┬─────────────────────┬─────────────────┤
 │   Customer Store    │    Admin Panel      │   Vendor Portal │
 │   (Next.js SSR)     │   (React SPA)       │   (Vue.js)      │
-│   - Product Catalog │   - Inventory Mgmt  │   - Product Mgmt│
-│   - Shopping Cart   │   - Order Management│   - Sales Analytics
+│   - Product Catalog │   - Inventory Mgmt  │   -Product Mgmt │
+│   - Shopping Cart   │   - Order Management│-Sales Analytics │
 │   - Checkout        │   - Customer Service│   - Commission  │
 └─────────────────────┴─────────────────────┴─────────────────┘
                                │
@@ -34,8 +34,8 @@ Loja virtual completa com catálogo de produtos, carrinho, pagamentos, painel ad
                     │   - Authentication  │
                     └──────────┬──────────┘
                                │
-┌─────────────────────────────────────────────────────────────┐
-│                   MICROSERVICES LAYER                       │
+┌───────────────────────────────────────────────────────────┐
+│                   MICROSERVICES LAYER                     │
 ├─────────────┬─────────────┬─────────────┬─────────────────┤
 │Product Svc  │Order Svc    │Payment Svc  │Recommendation   │
 │(Node.js)    │(Node.js)    │(Node.js)    │Service (Python) │
@@ -48,7 +48,7 @@ Loja virtual completa com catálogo de produtos, carrinho, pagamentos, painel ad
 │                      DATA LAYER                             │
 ├─────────────────────┬─────────────────────┬─────────────────┤
 │   PostgreSQL        │      Redis          │   Elasticsearch │
-│   - Products        │   - Sessions        │   - Search Index │
+│   - Products        │   - Sessions        │   - Search Index│
 │   - Orders          │   - Cart Cache      │   - Analytics   │
 │   - Users           │   - Recommendations │   - Logs        │
 └─────────────────────┴─────────────────────┴─────────────────┘
